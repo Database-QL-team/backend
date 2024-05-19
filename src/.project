@@ -14,4 +14,21 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>HELP.md</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Users/isc10/eclipse-workspace/References/HELP.md</locationURI>
+		</link>
+		<link>
+			<name>build.gradle</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Users/isc10/eclipse-workspace/References/build.gradle</locationURI>
+		</link>
+		<link>
+			<name>settings.gradle</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/Users/isc10/eclipse-workspace/References/settings.gradle</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

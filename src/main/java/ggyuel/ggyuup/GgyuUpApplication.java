@@ -9,5 +9,4 @@ public class GgyuUpApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(GgyuUpApplication.class, args);
 	}
-	// r깃
 }
