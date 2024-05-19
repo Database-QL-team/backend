@@ -1,5 +1,7 @@
 package ggyuel.ggyuup;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import org.json.JSONArray;
@@ -11,35 +13,34 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 public class APICrawling {
-	private static ArrayList<problem> problems = new ArrayList<problem>();
 	private static ArrayList<String> users = new ArrayList<>();
-	private static boolean[] solved = new boolean[40000];
-
-	public static void main(String[] args) {
-		crawlSchool();
-		System.out.println(users.size());
-		for(int i=100;i<users.size();i++) {
-			String user = users.get(i);
-			System.out.println(user);
-			crawlUser(user);
-		}
+	private static boolean[] solved = new boolean[35000];
+	
+	public static void main(String[] args) throws InterruptedException, IOException {
+		
 		crawlProblems();
+		Thread.sleep(20000);
     }
 
-    public static void crawlProblems() {
-        for (int page = 1; page <= 300; page++) {
+    public static void crawlProblems() throws IOException {
+    	BufferedWriter output1 = new BufferedWriter(new FileWriter("insertintoProblems.txt"));
+    	PrintWriter output2 = new PrintWriter("insertintoAlgorithms.txt");
+    	output2.println("INSERT INTO DB2024_Algorithms(pid, tag) VALUES");
+    	output1.write("INSERT INTO DB2024_Problems(pid, ptitle, tier, solvednum, link) VALUES");
+        for (int page = 1; page <= 600; page++) {
+        	
             try {
                 String path = "https://solved.ac/api/v3/search/problem?query=+&page=" + page + "&sort=id&direction=asc";
                 URL url = new URL(path);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
-                
+                Thread.sleep(100);
                 if (conn.getResponseCode() != 200) {
                     continue;
                 }
@@ -55,34 +56,41 @@ public class APICrawling {
                 JSONObject jsonResponse = new JSONObject(response.toString());
                 // 데이터 처리는 여기서...
                 
-                JSONArray itemlist = (JSONArray) jsonResponse.get("items");
+                JSONArray itemlist = jsonResponse.getJSONArray("items");
                 for(Object item : itemlist) {
+                	
                 	int pid = (int) ((JSONObject)item).get("problemId");
                 	if(solved[pid]) continue;
+                	
                 	String ptitle = (String)((JSONObject)item).get("titleKo");
                 	int tier = (int)((JSONObject)item).get("level");
                 	int solvednum = (int)((JSONObject)item).get("acceptedUserCount");
                 	String link = "https://www.acmicpc.net/problem/"+pid;
-                	System.out.print(pid+"\t");
-                	System.out.print(ptitle+"\t");
-                	System.out.print(tier+"\t");
-                	System.out.print(solvednum+"\t");
-                	System.out.print(link+"\t");
-                	problems.add(new problem(pid,ptitle,tier,solvednum,link));
-                	System.out.println();
+                	String query ="("+pid+",'"+ptitle+"',"+tier+","+solvednum+",'"+link+"')";
+                	output1.write(query);
+                	JSONArray tags = ((JSONObject)item).getJSONArray("tags");
+                	for(Object tag : tags){
+                		JSONArray displayNames = ((JSONObject)tag).getJSONArray("displayNames");
+                		String name = (String)displayNames.getJSONObject(0).get("name");
+                		output2.printf("(%d, '%s'),\n", pid, name);
+                	}
+                	
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        output1.flush();
+        output2.flush();
+        output1.close();
+        output2.close();
     }
 
     public static void crawlUser(String user) {
     	String URL = "https://solved.ac/profile/"+user+"/solved?page=";
     	int page = 1;
         try {
-        	Thread.sleep(100);
             while (true) {
                 Document Doc = Jsoup.connect(URL + page).get();
                 Elements pid = Doc.getElementsByClass("css-q9j30p");
@@ -94,9 +102,7 @@ public class APICrawling {
                 for(Element e : pid) {
                     if(++i % 2 == 0) continue; // 짝수번째 요소(문제제목)는 무시합니다.
                     solved[Integer.parseInt(e.text())] = true;
-                    System.out.print(" " + e.text());
                 }
-                System.out.println();
                 page++; // 다음 페이지로 이동합니다.
             }
         } catch (Exception e) {
@@ -121,18 +127,4 @@ public class APICrawling {
             }
 		}
     }
-}
-class problem{
-	int pid;
-	String ptitle;
-	int tier;
-	int solvednum;
-	String link;
-	problem(int pid, String ptitle, int tier, int solvednum, String link){
-		this.pid = pid;
-		this.ptitle = ptitle;
-		this.tier = tier;
-		this.solvednum = solvednum;
-		this.link = link;
-	}
 }
