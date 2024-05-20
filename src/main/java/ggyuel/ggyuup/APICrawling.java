@@ -23,16 +23,20 @@ public class APICrawling {
 	private static boolean[] solved = new boolean[35000];
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
-		
+		crawlSchool();
+		for(String user : users) {
+			Thread.sleep(1000);
+			crawlUser(user);
+		}
 		crawlProblems();
 		Thread.sleep(20000);
     }
 
     public static void crawlProblems() throws IOException {
-    	BufferedWriter output1 = new BufferedWriter(new FileWriter("insertintoProblems.txt"));
+    	PrintWriter output1 = new PrintWriter("insertintoProblems.txt");
     	PrintWriter output2 = new PrintWriter("insertintoAlgorithms.txt");
     	output2.println("INSERT INTO DB2024_Algorithms(pid, tag) VALUES");
-    	output1.write("INSERT INTO DB2024_Problems(pid, ptitle, tier, solvednum, link) VALUES");
+    	output1.println("INSERT INTO DB2024_Problems(pid, ptitle, tier, solvednum, link) VALUES");
         for (int page = 1; page <= 600; page++) {
         	
             try {
@@ -66,14 +70,18 @@ public class APICrawling {
                 	int tier = (int)((JSONObject)item).get("level");
                 	int solvednum = (int)((JSONObject)item).get("acceptedUserCount");
                 	String link = "https://www.acmicpc.net/problem/"+pid;
-                	String query ="("+pid+",'"+ptitle+"',"+tier+","+solvednum+",'"+link+"')";
-                	output1.write(query);
+                	output1.printf("(%d,'%s',%d,%d,'%s'),\n",pid,ptitle,tier,solvednum,link);
                 	JSONArray tags = ((JSONObject)item).getJSONArray("tags");
+                	if (tags.isEmpty()) {
+                        // 현재 페이지에 데이터가 없으면 반복을 종료합니다.
+                       continue;
+                    }
                 	for(Object tag : tags){
                 		JSONArray displayNames = ((JSONObject)tag).getJSONArray("displayNames");
                 		String name = (String)displayNames.getJSONObject(0).get("name");
-                		output2.printf("(%d, '%s'),\n", pid, name);
+                		output2.printf("(%d, '%s'),", pid, name);
                 	}
+                	output2.append('\n');
                 	
                 }
 
@@ -93,15 +101,15 @@ public class APICrawling {
         try {
             while (true) {
                 Document Doc = Jsoup.connect(URL + page).get();
-                Elements pid = Doc.getElementsByClass("css-q9j30p");
-                if (pid.isEmpty()) {
+                Elements pidtitle = Doc.getElementsByClass("css-q9j30p");
+                if (pidtitle.isEmpty()) {
                     // 현재 페이지에 데이터가 없으면 반복을 종료합니다.
                     break;
                 }
                 int i = 0;
-                for(Element e : pid) {
+                for(Element pid : pidtitle) {
                     if(++i % 2 == 0) continue; // 짝수번째 요소(문제제목)는 무시합니다.
-                    solved[Integer.parseInt(e.text())] = true;
+                    solved[Integer.parseInt(pid.text())] = true;
                 }
                 page++; // 다음 페이지로 이동합니다.
             }
