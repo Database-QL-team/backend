@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: io.micrometer:micrometer-tracing-bridge-brave:1.2.5" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.micrometer" artifactId="micrometer-tracing-bridge-brave" version="1.2.5" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.micrometer/micrometer-tracing-bridge-brave/1.2.5/967a34b920e584cb6a0e8a7542e0d2bbebb2e2d6/micrometer-tracing-bridge-brave-1.2.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.micrometer/micrometer-tracing-bridge-brave/1.2.5/4c212fed9d03585fc19f3f83ed17ee28cdc143c3/micrometer-tracing-bridge-brave-1.2.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

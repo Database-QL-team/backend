@@ -23,7 +23,6 @@ public class StudentRank {
             ArrayList<StudentRankRequestDTO.StudentRankDTO> result = new ArrayList<>();
 
             while (rs.next()) {
-                //Converter 여기 안에서 구현
                 int rank_ingroup = rs.getInt("rank_ingroup");
                 String handle = rs.getString("handle");
                 String userlink = rs.getString("userlink");
