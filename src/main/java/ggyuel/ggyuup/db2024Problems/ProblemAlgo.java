@@ -31,11 +31,14 @@ public class ProblemAlgo {
                 String link = rs.getString("link");
                 int solvednum = rs.getInt("solvednum");
                 String tier = rs.getString("tier");
-                String tag = rs.getString("tag");
+                //String tag = rs.getString("tag");
 
                 result.add(new ProblemResponseDTO.ProblemAlgoDTO(pid, pTitle, link, solvednum, tier));
             }
 
+            rs.close();
+            pstmt.close();
+            conn.close();
             return result;
         }
 
