@@ -26,8 +26,7 @@ public class PSTogetherSave {
 
 
             //PK인 togetherid 업데이트 및 저장
-            Variable.setTogetherid();
-            int togetherid = Variable.getTogetherid();
+            int togetherid = Variable.getPSTogetherCount() + 1;
             System.out.println("PK 업데이트");
             System.out.println(togetherid);
 

@@ -1,13 +1,28 @@
 package ggyuel.ggyuup.global;
 
-public class Variable {
-    private static int togetherid = 0;
-    public static int getTogetherid() {
-        return togetherid;
-    }
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-    public static void setTogetherid() {
-        togetherid += 1;
+public class Variable {
+
+    public static int getPSTogetherCount() {
+        String sql = "SELECT COUNT(*) FROM DB2024_PSTogether";
+
+        try (Connection conn = DBConnection.getDbPool().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 
 }
