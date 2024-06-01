@@ -18,6 +18,7 @@ public class ProblemTier {
             Connection conn = DBConnection.getDbPool().getConnection();
 
             String whichTier = request.toString();
+            System.out.println(whichTier);
 
             String query = "SELECT * FROM DB2024_Problems WHERE tier = ?";
             PreparedStatement pstmt = conn.prepareStatement(query);
@@ -26,6 +27,7 @@ public class ProblemTier {
 
             // Set the tier parameter
             pstmt.setString(1, whichTier);
+            System.out.println(query);
 
             // Execute the query
             ResultSet rs = pstmt.executeQuery();
@@ -40,6 +42,7 @@ public class ProblemTier {
 
                 tierProblems.add(new ProblemResponseDTO.ProblemTierDTO (pid, pTitle, link, solvednum, tier));
             }
+            System.out.println(tierProblems);
             return tierProblems;
         } catch (SQLException e){
             System.out.println(e);
