@@ -12,12 +12,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ProblemTier {
-    public static ArrayList<ProblemResponseDTO.ProblemTierDTO> getProblemsByTier(ProblemRequestDTO.ProblemTierTag request) {
+    public static ArrayList<ProblemResponseDTO.ProblemTierDTO> getProblemsByTier(String tier) {
 
         try{
             Connection conn = DBConnection.getDbPool().getConnection();
 
-            String whichTier = request.toString();
+            String whichTier = tier;
             System.out.println(whichTier);
 
             String query = "SELECT * FROM DB2024_Problems WHERE tier = ?";
@@ -38,9 +38,8 @@ public class ProblemTier {
                 String pTitle = rs.getString("pTitle");
                 String link = rs.getString("link");
                 int solvednum = rs.getInt("solvednum");
-                String tier = rs.getString("tier");
 
-                tierProblems.add(new ProblemResponseDTO.ProblemTierDTO (pid, pTitle, link, solvednum, tier));
+                tierProblems.add(new ProblemResponseDTO.ProblemTierDTO (pid, pTitle, link, solvednum));
             }
             System.out.println(tierProblems);
             return tierProblems;

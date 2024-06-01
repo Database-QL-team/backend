@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ProblemResponseDTO {
     public static class ProblemAlgoDTO {
-
         @JsonProperty
         int pid;
         @JsonProperty
@@ -30,18 +29,25 @@ public class ProblemResponseDTO {
     }
 
     public static class ProblemTierDTO {
+        @JsonProperty
         int pid;
+        @JsonProperty
         String p_title;
+        @JsonProperty
         String link;
+        @JsonProperty
         int solvednum;
-        String algo;
+        //@JsonProperty
+        //String algo;
 
-        public ProblemTierDTO (int pid, String p_title, String link, int solvednum, String algo){
+        public ProblemTierDTO (@JsonProperty("pid") int pid,
+                               @JsonProperty("p_title") String p_title,
+                               @JsonProperty("link") String link,
+                               @JsonProperty("solvednum") int solvednum) {
             this.pid = pid;
             this.p_title = p_title;
             this.link = link;
             this.solvednum = solvednum;
-            this.algo = algo;
         }
     }
 }
