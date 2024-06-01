@@ -1,6 +1,7 @@
 package ggyuel.ggyuup.db2024PStogether.controller;
 
 
+import ggyuel.ggyuup.db2024PStogether.PSTogetherGetDetail;
 import ggyuel.ggyuup.db2024PStogether.PSTogetherSave;
 import ggyuel.ggyuup.db2024PStogether.dto.PSTogetherRequestDTO;
 import ggyuel.ggyuup.db2024PStogether.dto.PSTogetherResponseDTO;
@@ -24,6 +25,12 @@ public class PSTogetherController {
     @PostMapping("")
     public ApiResponse<PSTogetherResponseDTO.PSTogetherDetailDTO> PSTogetherSave(@RequestBody @Validated PSTogetherRequestDTO.PSTogetherSaveDTO request) {
         PSTogetherResponseDTO.PSTogetherDetailDTO PSTogetherDTO = psTogetherSave(request);
+        return ApiResponse.onSuccess(PSTogetherDTO);
+    }
+
+    @GetMapping("")
+    public ApiResponse<PSTogetherResponseDTO.PSTogetherDetailDTO> getPSTogetherDetail(@RequestParam int id) {
+        PSTogetherResponseDTO.PSTogetherDetailDTO PSTogetherDTO = PSTogetherGetDetail.psTogetherGetDetail(id);
         return ApiResponse.onSuccess(PSTogetherDTO);
     }
 
