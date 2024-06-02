@@ -41,8 +41,6 @@ public class ProblemAlgo {
 
             System.out.println(result);
 
-            System.out.println(result);
-
             rs.close();
             pstmt.close();
             conn.close();

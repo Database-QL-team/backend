@@ -1,4 +1,4 @@
-package ggyuel.ggyuup.db2024PStogether;
+package ggyuel.ggyuup.db2024PStogether.service;
 
 import ggyuel.ggyuup.db2024PStogether.dto.PSTogetherRequestDTO;
 import ggyuel.ggyuup.db2024PStogether.dto.PSTogetherResponseDTO;

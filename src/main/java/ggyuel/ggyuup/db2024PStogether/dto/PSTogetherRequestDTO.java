@@ -19,12 +19,4 @@ public class PSTogetherRequestDTO {
         public int getPid() {return pid;}
 
     }
-
-    public static class PSTogetherId {
-        int togetherid;
-
-        public int getTogetherid() {
-            return togetherid;
-        }
-    }
 }

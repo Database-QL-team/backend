@@ -42,6 +42,9 @@ public class ProblemTier {
                 tierProblems.add(new ProblemResponseDTO.ProblemTierDTO (pid, pTitle, link, solvednum));
             }
             System.out.println(tierProblems);
+            rs.close();
+            pstmt.close();
+            conn.close();
             return tierProblems;
         } catch (SQLException e){
             System.out.println(e);

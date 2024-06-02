@@ -36,11 +36,16 @@ public class PSTogetherResponseDTO {
     }
 
     public static class PSTogetherPreviewDTO {
+        @JsonProperty
         int pid;
+        @JsonProperty
         String article_title;
+        @JsonProperty
         String handle;
 
-        public PSTogetherPreviewDTO (int pid, String article_title, String handle) {
+        public PSTogetherPreviewDTO (@JsonProperty("pid") int pid,
+                                     @JsonProperty("article_title") String article_title,
+                                     @JsonProperty("handle") String handle) {
             this.pid = pid;
             this.article_title = article_title;
             this.handle = handle;

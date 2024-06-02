@@ -1,4 +1,4 @@
-package ggyuel.ggyuup.db2024PStogether;
+package ggyuel.ggyuup.db2024PStogether.service;
 
 import ggyuel.ggyuup.db2024PStogether.dto.PSTogetherRequestDTO;
 import ggyuel.ggyuup.db2024PStogether.dto.PSTogetherResponseDTO;
@@ -43,6 +43,9 @@ public class PSTogetherGetDetail {
 
                 System.out.println("저장 성공");
 
+                rs.close();
+                pstmt.close();
+                conn.close();
                 return result;
             }
 
