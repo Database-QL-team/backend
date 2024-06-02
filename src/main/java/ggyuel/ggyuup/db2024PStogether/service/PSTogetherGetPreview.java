@@ -1,8 +1,6 @@
 package ggyuel.ggyuup.db2024PStogether.service;
 
-import ggyuel.ggyuup.db2024PStogether.dto.PSTogetherRequestDTO;
 import ggyuel.ggyuup.db2024PStogether.dto.PSTogetherResponseDTO;
-import ggyuel.ggyuup.db2024Problems.dto.ProblemResponseDTO;
 import ggyuel.ggyuup.global.DBConnection;
 
 import java.sql.Connection;

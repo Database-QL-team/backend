@@ -1,7 +1,7 @@
 package ggyuel.ggyuup.db2024Students.controller;
 
 
-import ggyuel.ggyuup.db2024Students.StudentRank;
+import ggyuel.ggyuup.db2024Students.service.StudentRank;
 import ggyuel.ggyuup.db2024Students.dto.StudentRankRequestDTO;
 import ggyuel.ggyuup.global.apiResponse.ApiResponse;
 import lombok.RequiredArgsConstructor;
