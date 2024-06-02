@@ -1,6 +1,7 @@
 package ggyuel.ggyuup.db2024PStogether.controller;
 
 
+import ggyuel.ggyuup.db2024PStogether.service.PSTogetherDelete;
 import ggyuel.ggyuup.db2024PStogether.service.PSTogetherGetDetail;
 import ggyuel.ggyuup.db2024PStogether.service.PSTogetherGetPreview;
 import ggyuel.ggyuup.db2024PStogether.dto.PSTogetherRequestDTO;
@@ -42,6 +43,17 @@ public class PSTogetherController {
     public ApiResponse<ArrayList<PSTogetherResponseDTO.PSTogetherPreviewDTO>> getPSTogetherSearch(@RequestParam int pid) {
         ArrayList<PSTogetherResponseDTO.PSTogetherPreviewDTO> PSTogetherPreviewDTO = PSTogetherSearch.getPSTogetherSearch(pid);
         return ApiResponse.onSuccess(PSTogetherPreviewDTO);
+    }
+
+    @DeleteMapping("/delete")
+    public ApiResponse<String> deletePSTogether(@RequestBody PSTogetherRequestDTO.PSTogetherDeleteDTO delete) {
+        String result = null;
+        Boolean isremoved = PSTogetherDelete.PSTogethercheckPW(delete);
+        if (isremoved) {
+            result = PSTogetherDelete.PSTogetherDelete(delete);
+        }
+        return ApiResponse.onSuccess(result);
+
     }
 
 }

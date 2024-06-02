@@ -19,7 +19,7 @@ public class PSTogetherSearch {
 
             System.out.println(whichPid);
 
-            String query = "SELECT * FROM DB2024_PStogether WHERE pid="+whichPid;;
+            String query = "SELECT * FROM DB2024_PStogether WHERE pid="+whichPid;
             System.out.println(query);
 
             PreparedStatement pstmt = conn.prepareStatement(query);

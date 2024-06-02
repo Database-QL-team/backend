@@ -19,4 +19,12 @@ public class PSTogetherRequestDTO {
         public int getPid() {return pid;}
 
     }
+    public static class PSTogetherDeleteDTO {
+        int togetherid;
+        String pw;
+
+        public int getTogetherid() {return togetherid;}
+        public String getPw() {return pw;}
+    }
+
 }
