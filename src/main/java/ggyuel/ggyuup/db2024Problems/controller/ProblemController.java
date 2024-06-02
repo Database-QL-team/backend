@@ -1,15 +1,11 @@
 package ggyuel.ggyuup.db2024Problems.controller;
 
 
-import ggyuel.ggyuup.db2024Problems.ProblemAlgo;
-import ggyuel.ggyuup.db2024Problems.ProblemTier;
-import ggyuel.ggyuup.db2024Problems.dto.ProblemRequestDTO;
+import ggyuel.ggyuup.db2024Problems.service.ProblemAlgo;
+import ggyuel.ggyuup.db2024Problems.service.ProblemTier;
 import ggyuel.ggyuup.db2024Problems.dto.ProblemResponseDTO;
-import ggyuel.ggyuup.db2024Students.StudentRank;
-import ggyuel.ggyuup.db2024Students.dto.StudentRankRequestDTO;
 import ggyuel.ggyuup.global.apiResponse.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;

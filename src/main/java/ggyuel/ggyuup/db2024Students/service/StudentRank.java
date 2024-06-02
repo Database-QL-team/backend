@@ -1,4 +1,4 @@
-package ggyuel.ggyuup.db2024Students;
+package ggyuel.ggyuup.db2024Students.service;
 
 import ggyuel.ggyuup.db2024Students.dto.StudentRankRequestDTO;
 import ggyuel.ggyuup.global.DBConnection;
@@ -31,12 +31,12 @@ public class StudentRank {
 
                 // Add the row data to the result list
                 result.add(new StudentRankRequestDTO.StudentRankDTO(rank_ingroup, handle, userlink, tier, solvednum));
-
             }
             rs.close();
             pstmt.close();
             conn.close();
             return result;
+
         } catch (SQLException e){
             System.out.println(e);
         }

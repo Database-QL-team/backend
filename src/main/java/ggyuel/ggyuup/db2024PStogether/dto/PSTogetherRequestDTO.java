@@ -1,6 +1,5 @@
 package ggyuel.ggyuup.db2024PStogether.dto;
 
-import java.util.ArrayList;
 
 public class PSTogetherRequestDTO {
     public static class PSTogetherSaveDTO {

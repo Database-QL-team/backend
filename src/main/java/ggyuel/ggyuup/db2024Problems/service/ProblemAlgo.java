@@ -1,5 +1,4 @@
-package ggyuel.ggyuup.db2024Problems;
-
+package ggyuel.ggyuup.db2024Problems.service;
 
 import ggyuel.ggyuup.db2024Problems.dto.ProblemRequestDTO;
 import ggyuel.ggyuup.db2024Problems.dto.ProblemResponseDTO;
@@ -11,45 +10,46 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class ProblemTier {
-    public static ArrayList<ProblemResponseDTO.ProblemTierDTO> getProblemsByTier(String tier) {
+public class ProblemAlgo {
+    public static ArrayList<ProblemResponseDTO.ProblemAlgoDTO> getProblemsByTag (String request) {
 
-        try{
+        try {
             Connection conn = DBConnection.getDbPool().getConnection();
+            System.out.println("DB 연결");
 
-            String whichTier = tier;
-            System.out.println(whichTier);
+            String whichTag = request;
+            System.out.println(whichTag);
 
-            String query = "SELECT * FROM DB2024_Problems WHERE tier = ?";
+            String query = "SELECT * FROM DB2024_VIEW_tag_" + whichTag + " ORDER BY solvednum DESC";
             PreparedStatement pstmt = conn.prepareStatement(query);
-
-            ArrayList<ProblemResponseDTO.ProblemTierDTO> tierProblems = new ArrayList<>();
-
-            // Set the tier parameter
-            pstmt.setString(1, whichTier);
             System.out.println(query);
 
-            // Execute the query
             ResultSet rs = pstmt.executeQuery();
+            ArrayList<ProblemResponseDTO.ProblemAlgoDTO> result = new ArrayList<>();
 
-            // Process each row and add it to the tierProblems list
             while (rs.next()) {
+                // Process each row and add it to the result list
                 int pid = rs.getInt("pid");
                 String pTitle = rs.getString("pTitle");
                 String link = rs.getString("link");
                 int solvednum = rs.getInt("solvednum");
+                String tier = rs.getString("tier");
+                //String tag = rs.getString("tag");
 
-                tierProblems.add(new ProblemResponseDTO.ProblemTierDTO (pid, pTitle, link, solvednum));
+                result.add(new ProblemResponseDTO.ProblemAlgoDTO(pid, pTitle, link, solvednum, tier));
             }
-            System.out.println(tierProblems);
+
+            System.out.println(result);
+
             rs.close();
             pstmt.close();
             conn.close();
-            return tierProblems;
-        } catch (SQLException e){
+            return result;
+
+        }
+        catch (SQLException e){
             System.out.println(e);
         }
         return null;
-        }
-
+    }
 }

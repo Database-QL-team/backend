@@ -6,7 +6,7 @@ public class DBConnection {
 
     static {
         dbPool = new HikariDataSource();
-        dbPool.setJdbcUrl("jdbc:mysql://localhost:3306/DB2024Team01");
+        dbPool.setJdbcUrl("jdbc:mysql://localhost:3306/DB2024Team01?useUnicode=true&characterEncoding=utf8");
         dbPool.setUsername("root");
         dbPool.setPassword("0000");
 
