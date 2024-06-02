@@ -8,8 +8,6 @@ public class PSTogetherResponseDTO {
 
     public static class PSTogetherDetailDTO {
         @JsonProperty
-        private int togetherid;
-        @JsonProperty
         private int pid;
         @JsonProperty
         private String title;
@@ -20,13 +18,11 @@ public class PSTogetherResponseDTO {
         @JsonProperty
         private String pw;
 
-        public PSTogetherDetailDTO(@JsonProperty("togetherid") int togetherid,
-                                   @JsonProperty("pid") int pid,
+        public PSTogetherDetailDTO(@JsonProperty("pid") int pid,
                                    @JsonProperty("title") String title,
                                    @JsonProperty("handle") String handle,
                                    @JsonProperty("github_link") String github_link,
                                    @JsonProperty("pw") String pw) {
-            this.togetherid = togetherid;
             this.pid = pid;
             this.title = title;
             this.handle = handle;
