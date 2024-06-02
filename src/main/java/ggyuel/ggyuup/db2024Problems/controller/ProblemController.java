@@ -20,12 +20,14 @@ import java.util.ArrayList;
 public class ProblemController {
 
     @GetMapping("/algo")
-    public ApiResponse<ArrayList<ProblemResponseDTO.ProblemAlgoDTO>> getProblemAlgo(@RequestBody @Validated ProblemRequestDTO.ProblemAlgoTag request) {
-        return ApiResponse.onSuccess(ProblemAlgo.getProblemsByTag(request));
+    public ApiResponse<ArrayList<ProblemResponseDTO.ProblemAlgoDTO>> getProblemAlgo(@RequestParam String tag) {
+        ArrayList<ProblemResponseDTO.ProblemAlgoDTO> ProblemAlgoList = ProblemAlgo.getProblemsByTag(tag);
+        return ApiResponse.onSuccess(ProblemAlgoList);
     }
 
     @GetMapping("/tier")
-    public ApiResponse<ArrayList<ProblemResponseDTO.ProblemTierDTO>> getProblemTier(@RequestBody @Validated ProblemRequestDTO.ProblemTierTag request) {
-        return ApiResponse.onSuccess(ProblemTier.getProblemsByTier(request));
+    public ApiResponse<ArrayList<ProblemResponseDTO.ProblemTierDTO>> getProblemTier(@RequestParam String tier) {
+        ArrayList<ProblemResponseDTO.ProblemTierDTO> ProblemTierList = ProblemTier.getProblemsByTier(tier);
+        return ApiResponse.onSuccess(ProblemTierList);
     }
 }

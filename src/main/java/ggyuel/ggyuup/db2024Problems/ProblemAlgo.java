@@ -11,15 +11,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ProblemAlgo {
-    public static ArrayList<ProblemResponseDTO.ProblemAlgoDTO> getProblemsByTag (ProblemRequestDTO.ProblemAlgoTag request) {
+    public static ArrayList<ProblemResponseDTO.ProblemAlgoDTO> getProblemsByTag (String request) {
 
         try {
             Connection conn = DBConnection.getDbPool().getConnection();
+            System.out.println("DB 연결");
 
-            String whichTag = request.toString();
+            String whichTag = request;
+            System.out.println(whichTag);
 
             String query = "SELECT * FROM DB2024_VIEW_tag_" + whichTag + " ORDER BY solvednum DESC";
             PreparedStatement pstmt = conn.prepareStatement(query);
+            System.out.println(query);
 
             ResultSet rs = pstmt.executeQuery();
             ArrayList<ProblemResponseDTO.ProblemAlgoDTO> result = new ArrayList<>();
@@ -31,14 +34,19 @@ public class ProblemAlgo {
                 String link = rs.getString("link");
                 int solvednum = rs.getInt("solvednum");
                 String tier = rs.getString("tier");
-                String tag = rs.getString("tag");
+                //String tag = rs.getString("tag");
 
                 result.add(new ProblemResponseDTO.ProblemAlgoDTO(pid, pTitle, link, solvednum, tier));
             }
 
-            return result;
-        }
+            System.out.println(result);
 
+            rs.close();
+            pstmt.close();
+            conn.close();
+            return result;
+
+        }
         catch (SQLException e){
             System.out.println(e);
         }
