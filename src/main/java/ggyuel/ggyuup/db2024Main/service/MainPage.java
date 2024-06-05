@@ -18,6 +18,8 @@ public class MainPage {
 
             Connection conn = DBConnection.getDbPool().getConnection();
             System.out.println("DB연결");
+
+            conn.setAutoCommit(false);
             PreparedStatement pstmt1 = conn.prepareStatement(
                     "select ranking, solvednum "
                             + "from DB2024_Organizations "
@@ -57,6 +59,9 @@ public class MainPage {
             solved_num_gap = rival_solvednum - ewha_solvednum;
 
             MainResponseDTO.GroupInfoDTO groupInfoDTO = new MainResponseDTO.GroupInfoDTO(ewha_ranking, rival_ranking, rival_group_name, solved_num_gap);
+
+            conn.commit();
+            conn.setAutoCommit(true);
 
             rs1.close();
             rs2.close();
