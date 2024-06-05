@@ -10,23 +10,23 @@ public class PSTogetherResponseDTO {
         @JsonProperty
         private int pid;
         @JsonProperty
-        private String title;
+        private String togethertitle;
         @JsonProperty
         private String handle;
         @JsonProperty
-        private String github_link;
+        private String link;
         @JsonProperty
         private String pw;
 
         public PSTogetherDetailDTO(@JsonProperty("pid") int pid,
-                                   @JsonProperty("title") String title,
+                                   @JsonProperty("togethertitle") String togethertitle,
                                    @JsonProperty("handle") String handle,
-                                   @JsonProperty("github_link") String github_link,
+                                   @JsonProperty("link") String link,
                                    @JsonProperty("pw") String pw) {
             this.pid = pid;
-            this.title = title;
+            this.togethertitle = togethertitle;
             this.handle = handle;
-            this.github_link = github_link;
+            this.link = link;
             this.pw = pw;
         }
     }

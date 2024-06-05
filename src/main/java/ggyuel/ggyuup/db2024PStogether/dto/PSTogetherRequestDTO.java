@@ -4,16 +4,16 @@ package ggyuel.ggyuup.db2024PStogether.dto;
 public class PSTogetherRequestDTO {
     public static class PSTogetherSaveDTO {
 
-        String title;
+        String togethertitle;
         String handle;
-        String github_link;
+        String link;
         String pw;
         int pid;
 
         public String getHandle() {return handle;}
-        public String getGithub_link() {return github_link;}
+        public String getGithub_link() {return link;}
         public String getPw() {return pw;}
-        public String getTitle() {return title;}
+        public String getTitle() {return togethertitle;}
 
         public int getPid() {return pid;}
 
