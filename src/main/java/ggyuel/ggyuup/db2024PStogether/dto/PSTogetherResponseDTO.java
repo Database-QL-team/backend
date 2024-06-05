@@ -35,15 +35,15 @@ public class PSTogetherResponseDTO {
         @JsonProperty
         int pid;
         @JsonProperty
-        String article_title;
+        String togethertitle;
         @JsonProperty
         String handle;
 
         public PSTogetherPreviewDTO (@JsonProperty("pid") int pid,
-                                     @JsonProperty("article_title") String article_title,
+                                     @JsonProperty("togethertitle") String togethertitle,
                                      @JsonProperty("handle") String handle) {
             this.pid = pid;
-            this.article_title = article_title;
+            this.togethertitle = togethertitle;
             this.handle = handle;
         }
     }
