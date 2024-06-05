@@ -31,7 +31,7 @@ public class PSTogetherSearch {
                 int pid = rs.getInt("pid");
                 String handle = rs.getString("handle");
                 String togethertitle = rs.getString("togethertitle");
-                result.add(new PSTogetherResponseDTO.PSTogetherPreviewDTO(p_id, togethertitle, handle));
+                result.add(new PSTogetherResponseDTO.PSTogetherPreviewDTO(pid, togethertitle, handle));
             }
 
             rs.close();

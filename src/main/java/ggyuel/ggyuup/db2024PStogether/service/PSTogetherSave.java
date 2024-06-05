@@ -22,14 +22,14 @@ public class PSTogetherSave {
             // 사용자 입력 받아오기
             String togethertitle = request.getTitle();
             int pid = request.getPid();
-            String gitlink = request.getGithub_link();
+            String link = request.getGithub_link();
             String handle = request.getHandle();
             String pw = request.getPw();
 
             // DB에 저장
             pstmt.setString(1, togethertitle);
             pstmt.setInt(2, pid);
-            pstmt.setString(3, gitlink);
+            pstmt.setString(3, link);
             pstmt.setString(4, handle);
             pstmt.setString(5, pw);
             pstmt.executeUpdate();
@@ -37,7 +37,7 @@ public class PSTogetherSave {
             conn.commit();
             System.out.println("저장 성공");
 
-            return new PSTogetherResponseDTO.PSTogetherDetailDTO(pid, togethertitle, handle, gitlink, pw);
+            return new PSTogetherResponseDTO.PSTogetherDetailDTO(pid, togethertitle, handle, link, pw);
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
