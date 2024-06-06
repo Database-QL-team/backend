@@ -22,7 +22,7 @@ public class PSTogetherDelete {
             System.out.println(togetherid);
             System.out.println(pw);
 
-            String query = "SELECT pw FROM DB2024_PStogether WHERE togetherid="+togetherid;
+            String query = "SELECT * FROM DB2024_PStogether WHERE togetherid="+togetherid;
             PreparedStatement pstmt = conn.prepareStatement(query);
             ResultSet rs = pstmt.executeQuery();
             System.out.println(query);

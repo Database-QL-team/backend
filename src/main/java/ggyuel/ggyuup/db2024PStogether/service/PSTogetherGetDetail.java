@@ -39,7 +39,7 @@ public class PSTogetherGetDetail {
                 pstmt.close();
                 conn.close();
 
-                return new PSTogetherResponseDTO.PSTogetherDetailDTO(pid, title, handle, link, pw);
+                return new PSTogetherResponseDTO.PSTogetherDetailDTO(togetherid, pid, title, handle, link, pw);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());

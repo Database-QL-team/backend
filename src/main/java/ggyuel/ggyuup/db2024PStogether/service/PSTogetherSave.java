@@ -6,6 +6,7 @@ import ggyuel.ggyuup.global.DBConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class PSTogetherSave {
@@ -18,10 +19,10 @@ public class PSTogetherSave {
         try {
             Connection conn = DBConnection.getDbPool().getConnection();
             System.out.println("DB 연결");
+            conn.setAutoCommit(false);
 
             String sql = "INSERT INTO DB2024_PStogether (togethertitle, pid, link, handle, pw) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            conn.setAutoCommit(false);
+            PreparedStatement pstmt = conn.prepareStatement(sql, new String[]{"togetherid"}); // togetherid 반환
 
             // 사용자 입력 받아오기
             String togethertitle = request.getTogethertitle();
@@ -41,10 +42,20 @@ public class PSTogetherSave {
             pstmt.setString(5, pw);
             pstmt.executeUpdate();
 
+            // 생성된 키 받아오기
+            ResultSet generatedKeys = pstmt.getGeneratedKeys();
+            int togetherid = 0;
+            if (generatedKeys.next()) {
+                togetherid = generatedKeys.getInt(1);
+            } else {
+                throw new SQLException("게시물을 추가하는 동안 키 생성 실패");
+            }
+
             conn.commit();
             System.out.println("저장 성공");
 
-            return new PSTogetherResponseDTO.PSTogetherDetailDTO(pid, togethertitle, handle, link, pw);
+            // PSTogetherDetailDTO에 togetherId 포함하여 반환
+            return new PSTogetherResponseDTO.PSTogetherDetailDTO(togetherid, pid, togethertitle, handle, link, pw);
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -53,4 +64,5 @@ public class PSTogetherSave {
         return null;
     }
 }
+
 
