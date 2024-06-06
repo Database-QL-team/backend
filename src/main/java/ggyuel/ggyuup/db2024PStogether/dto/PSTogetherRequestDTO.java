@@ -11,9 +11,9 @@ public class PSTogetherRequestDTO {
         int pid;
 
         public String getHandle() {return handle;}
-        public String getGithub_link() {return link;}
+        public String getLink() {return link;}
         public String getPw() {return pw;}
-        public String getTitle() {return togethertitle;}
+        public String getTogethertitle() {return togethertitle;}
 
         public int getPid() {return pid;}
 
