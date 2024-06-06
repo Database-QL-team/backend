@@ -19,7 +19,6 @@ public class PSTogetherSave {
         try {
             Connection conn = DBConnection.getDbPool().getConnection();
             System.out.println("DB 연결");
-            conn.setAutoCommit(false);
 
             String sql = "INSERT INTO DB2024_PStogether (togethertitle, pid, link, handle, pw) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql, new String[]{"togetherid"}); // togetherid 반환
@@ -52,7 +51,9 @@ public class PSTogetherSave {
             }
 
             conn.commit();
-            System.out.println("저장 성공");
+
+            pstmt.close();
+            conn.close();
 
             // PSTogetherDetailDTO에 togetherId 포함하여 반환
             return new PSTogetherResponseDTO.PSTogetherDetailDTO(togetherid, pid, togethertitle, handle, link, pw);

@@ -16,11 +16,7 @@ public class PSTogetherSearch {
             System.out.println("DB 연결");
 
             int whichPid = p_id;
-
-            System.out.println(whichPid);
-
             String query = "SELECT * FROM DB2024_PStogether WHERE pid="+whichPid;
-            System.out.println(query);
 
             PreparedStatement pstmt = conn.prepareStatement(query);
             ResultSet rs = pstmt.executeQuery();
@@ -28,16 +24,17 @@ public class PSTogetherSearch {
 
             while (rs.next()) {
                 // Process each row and add it to the result list
+                int togetherid = rs.getInt("togetherid");
                 int pid = rs.getInt("pid");
                 String handle = rs.getString("handle");
                 String togethertitle = rs.getString("togethertitle");
-                result.add(new PSTogetherResponseDTO.PSTogetherPreviewDTO(pid, togethertitle, handle));
+                result.add(new PSTogetherResponseDTO.PSTogetherPreviewDTO(togetherid, pid, togethertitle, handle));
             }
 
             rs.close();
             pstmt.close();
             conn.close();
-            System.out.println(result);
+
             return result;
 
         } catch (SQLException e){

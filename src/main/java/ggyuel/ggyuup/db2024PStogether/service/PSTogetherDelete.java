@@ -13,14 +13,10 @@ public class PSTogetherDelete {
 
         try {
             Connection conn = DBConnection.getDbPool().getConnection();
-            System.out.println("DB 연결");
 
             int togetherid = delete.getTogetherid();
             String pw = delete.getPw();
             Boolean PWcheck = Boolean.FALSE;
-
-            System.out.println(togetherid);
-            System.out.println(pw);
 
             String query = "SELECT * FROM DB2024_PStogether WHERE togetherid="+togetherid;
             PreparedStatement pstmt = conn.prepareStatement(query);
@@ -53,12 +49,10 @@ public class PSTogetherDelete {
 
         try {
             Connection conn = DBConnection.getDbPool().getConnection();
-            System.out.println("DB 연결");
 
             int togetherid = delete.getTogetherid();
-            System.out.println(togetherid);
-
             String query = "DELETE FROM DB2024_PStogether WHERE togetherid = ?";
+
             try (PreparedStatement pstmt = conn.prepareStatement(query)) {
                 pstmt.setInt(1, togetherid);
                 int rowsAffected = pstmt.executeUpdate();
@@ -67,6 +61,8 @@ public class PSTogetherDelete {
                     resultMessage = "삭제할 데이터가 없습니다";
                 }
             }
+
+            conn.close();
 
         }catch (SQLException e){
             System.out.println(e);

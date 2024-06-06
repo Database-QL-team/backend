@@ -2,8 +2,6 @@ package ggyuel.ggyuup.db2024PStogether.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
-
 public class PSTogetherResponseDTO {
 
     public static class PSTogetherDetailDTO {
@@ -37,15 +35,19 @@ public class PSTogetherResponseDTO {
 
     public static class PSTogetherPreviewDTO {
         @JsonProperty
+        int togetherid;
+        @JsonProperty
         int pid;
         @JsonProperty
         String togethertitle;
         @JsonProperty
         String handle;
 
-        public PSTogetherPreviewDTO (@JsonProperty("pid") int pid,
+        public PSTogetherPreviewDTO (@JsonProperty("togetherid") int togetherid,
+                                     @JsonProperty("pid") int pid,
                                      @JsonProperty("togethertitle") String togethertitle,
                                      @JsonProperty("handle") String handle) {
+            this.togetherid = togetherid;
             this.pid = pid;
             this.togethertitle = togethertitle;
             this.handle = handle;

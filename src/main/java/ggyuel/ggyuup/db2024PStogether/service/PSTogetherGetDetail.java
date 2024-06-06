@@ -13,14 +13,12 @@ public class PSTogetherGetDetail {
 
         try {
             Connection conn = DBConnection.getDbPool().getConnection();
-            System.out.println("DB 연결");
 
             int whichtogetherid = num;
 
             String sql = "SELECT * FROM DB2024_PStogether WHERE togetherid = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, whichtogetherid);
-            conn.setAutoCommit(false);
 
             ResultSet rs = pstmt.executeQuery();
 
@@ -31,9 +29,6 @@ public class PSTogetherGetDetail {
                 String handle = rs.getString("handle");
                 String link = rs.getString("link");
                 String pw = rs.getString("pw");
-
-                conn.commit();
-                System.out.println("저장 성공");
 
                 rs.close();
                 pstmt.close();

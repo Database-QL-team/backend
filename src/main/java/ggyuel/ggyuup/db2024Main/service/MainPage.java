@@ -17,9 +17,8 @@ public class MainPage {
             int solved_num_gap = 0;
 
             Connection conn = DBConnection.getDbPool().getConnection();
-            System.out.println("DB연결");
-
             conn.setAutoCommit(false);
+
             PreparedStatement pstmt1 = conn.prepareStatement(
                     "select ranking, solvednum "
                             + "from DB2024_Organizations "
@@ -31,14 +30,9 @@ public class MainPage {
             if(rs1.next()) {
                 ewha_ranking = rs1.getInt("ranking");
                 ewha_solvednum = rs1.getInt("solvednum");
-
-                // Use the variables as needed
-                System.out.println("Ranking: " + ewha_ranking);
-                System.out.println("Solved Number: " + ewha_solvednum);
             }
 
 
-// 메서드2 직전 등수 단체 구하기: groupname을 인자로 받아야 함 (이화여자대학교)
             PreparedStatement pstmt2 = conn.prepareStatement(
                     "SELECT ranking, groupname, solvednum " +
                             "FROM DB2024_Organizations " +
@@ -50,10 +44,6 @@ public class MainPage {
                 rival_group_name = rs2.getString("groupName");
                 rival_ranking = rs2.getInt("ranking");
                 rival_solvednum = rs2.getInt("solvednum");
-                // Use the variables as needed
-                System.out.println("GroupName: " + rival_group_name);
-                System.out.println("Ranking: " + rival_ranking);
-                System.out.println("Solved Number: " + rival_solvednum);
             }
 
             solved_num_gap = rival_solvednum - ewha_solvednum;
@@ -76,59 +66,7 @@ public class MainPage {
         return null;
     }
 
-    public static String postTodayPS() {
-        try {
-            Connection conn = DBConnection.getDbPool().getConnection();
-            ArrayList<MainResponseDTO.TodayPSDTO> PostTodayPS = new ArrayList<>();
-            conn.setAutoCommit(false);
 
-            String query1 = "INSERT INTO DB2024_TodayPS (pid, picked, handle)" +
-                    " SELECT pid, 0, NULL " +
-                    " FROM ( " +
-                    "     SELECT pid " +
-                    "     FROM DB2024_Problems " +
-                    "     WHERE tier BETWEEN 1 AND 5 " +
-                    "     ORDER BY solvednum DESC " +
-                    "     LIMIT 5 " +
-                    " ) AS subset; ";
-
-            String query2 = "INSERT INTO DB2024_TodayPS (pid, picked, handle)" +
-                    " SELECT pid, 0, NULL " +
-                    " FROM ( " +
-                    "     SELECT pid " +
-                    "     FROM DB2024_Problems " +
-                    "     WHERE tier BETWEEN 6 AND 10 " +
-                    "     ORDER BY solvednum DESC " +
-                    "     LIMIT 5 " +
-                    " ) AS subset; ";
-
-            String query3 = "INSERT INTO DB2024_TodayPS (pid, picked, handle)" +
-                    " SELECT pid, 0, NULL " +
-                    " FROM ( " +
-                    "     SELECT pid " +
-                    "     FROM DB2024_Problems " +
-                    "     WHERE tier BETWEEN 11 AND 15 " +
-                    "     ORDER BY solvednum DESC " +
-                    "     LIMIT 5 " +
-                    " ) AS subset; ";
-
-            PreparedStatement pstmt1 = conn.prepareStatement(query1);
-            PreparedStatement pstmt2 = conn.prepareStatement(query2);
-            PreparedStatement pstmt3 = conn.prepareStatement(query3);
-            pstmt1.executeUpdate();
-            pstmt2.executeUpdate();
-            pstmt3.executeUpdate();
-
-            conn.commit();
-            System.out.println("저장 성공");
-
-
-        } catch (SQLException e){
-            System.out.println(e);
-        }
-
-        return "TodayPS 생성 성공";
-    }
 
     public static ArrayList<MainResponseDTO.TodayPSDTO> getTodayPS() {
         try {
@@ -149,6 +87,9 @@ public class MainPage {
 
                 TodayPSlist.add(new MainResponseDTO.TodayPSDTO (pid, pTitle, tier, picked, handle));
             }
+
+            rs.close();
+            conn.close();
             return TodayPSlist;  // 브론즈 5개, 실버 5개, 골드 5개 순서로 반환함
         } catch (SQLException e){
             System.out.println(e);
@@ -167,6 +108,5 @@ public class MainPage {
         mainPageDTO.setTodayPSList(todayPSDTOList);
 
         return mainPageDTO;
-
     }
 }

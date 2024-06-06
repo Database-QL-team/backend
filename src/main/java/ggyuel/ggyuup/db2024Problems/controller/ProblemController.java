@@ -22,7 +22,7 @@ public class ProblemController {
     }
 
     @GetMapping("/tier")
-    public ApiResponse<ArrayList<ProblemResponseDTO.ProblemTierDTO>> getProblemTier(@RequestParam String tier) {
+    public ApiResponse<ArrayList<ProblemResponseDTO.ProblemTierDTO>> getProblemTier(@RequestParam int tier) {
         ArrayList<ProblemResponseDTO.ProblemTierDTO> ProblemTierList = ProblemTier.getProblemsByTier(tier);
         return ApiResponse.onSuccess(ProblemTierList);
     }

@@ -23,10 +23,11 @@ public class PSTogetherGetPreview {
 
             while (rs.next()) {
                 // Process each row and add it to the result list
+                int togetherid = rs.getInt("togetherid");
                 int pid = rs.getInt("pid");
                 String handle = rs.getString("handle");
                 String togethertitle = rs.getString("togethertitle");
-                result.add(new PSTogetherResponseDTO.PSTogetherPreviewDTO(pid, togethertitle, handle));
+                result.add(new PSTogetherResponseDTO.PSTogetherPreviewDTO(togetherid, pid, togethertitle, handle));
             }
 
             rs.close();

@@ -1,7 +1,6 @@
 package ggyuel.ggyuup.db2024Problems.service;
 
 
-import ggyuel.ggyuup.db2024Problems.dto.ProblemRequestDTO;
 import ggyuel.ggyuup.db2024Problems.dto.ProblemResponseDTO;
 import ggyuel.ggyuup.global.DBConnection;
 
@@ -12,22 +11,20 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ProblemTier {
-    public static ArrayList<ProblemResponseDTO.ProblemTierDTO> getProblemsByTier(String tier) {
+    public static ArrayList<ProblemResponseDTO.ProblemTierDTO> getProblemsByTier(int tier) {
 
         try{
             Connection conn = DBConnection.getDbPool().getConnection();
 
-            String whichTier = tier;
-            System.out.println(whichTier);
+            int whichTier = tier;
 
-            String query = "SELECT * FROM DB2024_Problems WHERE tier = ?";
+            String query = "SELECT * FROM DB2024_Problems WHERE tier = ? ORDER BY solvednum DESC";
             PreparedStatement pstmt = conn.prepareStatement(query);
 
             ArrayList<ProblemResponseDTO.ProblemTierDTO> tierProblems = new ArrayList<>();
 
             // Set the tier parameter
-            pstmt.setString(1, whichTier);
-            System.out.println(query);
+            pstmt.setInt(1, whichTier);
 
             // Execute the query
             ResultSet rs = pstmt.executeQuery();
