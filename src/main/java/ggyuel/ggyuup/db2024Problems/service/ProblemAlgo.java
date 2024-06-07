@@ -25,6 +25,7 @@ public class ProblemAlgo {
             Connection conn = DBConnection.getDbPool().getConnection();
             System.out.println("DB 연결");
 
+            // 사용자가 입력한 알고리즘 태그 추출
             String whichTag = request;
             System.out.println(whichTag);
 
