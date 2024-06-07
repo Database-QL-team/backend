@@ -1,6 +1,7 @@
 package ggyuel.ggyuup.db2024PStogether.service;
 
 import ggyuel.ggyuup.db2024PStogether.dto.PSTogetherRequestDTO;
+import ggyuel.ggyuup.db2024PStogether.dto.PSTogetherResponseDTO;
 import ggyuel.ggyuup.global.DBConnection;
 
 import java.sql.Connection;
@@ -26,7 +27,9 @@ public class PSTogetherDelete {
             if(rs.next()) {
                 String realPW = rs.getString("pw");
                 System.out.println(realPW);
-                if (pw.equals(realPW)) {PWcheck = Boolean.TRUE;}
+                if (pw.equals(realPW)) {
+                    PWcheck = Boolean.TRUE;
+                }
                 else {PWcheck = Boolean.FALSE;}
                 System.out.println(PWcheck);
             }
@@ -64,7 +67,7 @@ public class PSTogetherDelete {
 
             conn.close();
 
-        }catch (SQLException e){
+        } catch (SQLException e){
             System.out.println(e);
         }
         return resultMessage;

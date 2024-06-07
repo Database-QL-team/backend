@@ -2,7 +2,7 @@ package ggyuel.ggyuup.db2024Students.controller;
 
 
 import ggyuel.ggyuup.db2024Students.service.StudentRank;
-import ggyuel.ggyuup.db2024Students.dto.StudentRankRequestDTO;
+import ggyuel.ggyuup.db2024Students.dto.StudentRankResponseDTO;
 import ggyuel.ggyuup.global.apiResponse.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +18,7 @@ public class StudentRankController {
 
 
     @GetMapping("")
-    public ApiResponse<ArrayList<StudentRankRequestDTO.StudentRankDTO>> getStudentRank() {
+    public ApiResponse<ArrayList<StudentRankResponseDTO.StudentRankDTO>> getStudentRank() {
         return ApiResponse.onSuccess(StudentRank.getStudentsOrderedByRank());
     }
 }

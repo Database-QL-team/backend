@@ -1,6 +1,5 @@
 package ggyuel.ggyuup.db2024Problems.service;
 
-import ggyuel.ggyuup.db2024Problems.dto.ProblemRequestDTO;
 import ggyuel.ggyuup.db2024Problems.dto.ProblemResponseDTO;
 import ggyuel.ggyuup.global.DBConnection;
 
@@ -33,8 +32,7 @@ public class ProblemAlgo {
                 String pTitle = rs.getString("pTitle");
                 String link = rs.getString("link");
                 int solvednum = rs.getInt("solvednum");
-                String tier = rs.getString("tier");
-                //String tag = rs.getString("tag");
+                int tier = rs.getInt("tier");
 
                 result.add(new ProblemResponseDTO.ProblemAlgoDTO(pid, pTitle, link, solvednum, tier));
             }
@@ -44,8 +42,8 @@ public class ProblemAlgo {
             rs.close();
             pstmt.close();
             conn.close();
-            return result;
 
+            return result;
         }
         catch (SQLException e){
             System.out.println(e);

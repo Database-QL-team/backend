@@ -30,6 +30,8 @@ public class PSTogetherGetDetail {
                 String link = rs.getString("link");
                 String pw = rs.getString("pw");
 
+                conn.commit();
+
                 rs.close();
                 pstmt.close();
                 conn.close();

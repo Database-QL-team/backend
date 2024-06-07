@@ -18,19 +18,6 @@ public enum ErrorStatus implements BaseErrorCode {
     _UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON401","인증이 필요합니다."),
     _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다.");
 
-
-    // 멤버 관련 에러
-
-    // 예시,,,
-
-    // Ror test
-
-    // 리뷰 관련 에러
-
-
-    // 문의 관련 에러
-
-
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;

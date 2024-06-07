@@ -2,7 +2,7 @@ package ggyuel.ggyuup.db2024Students.dto;
 
 import lombok.Getter;
 
-public class StudentRankRequestDTO {
+public class StudentRankResponseDTO {
 
     @Getter
     public static class StudentRankDTO{

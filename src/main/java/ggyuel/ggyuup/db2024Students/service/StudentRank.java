@@ -1,6 +1,6 @@
 package ggyuel.ggyuup.db2024Students.service;
 
-import ggyuel.ggyuup.db2024Students.dto.StudentRankRequestDTO;
+import ggyuel.ggyuup.db2024Students.dto.StudentRankResponseDTO;
 import ggyuel.ggyuup.global.DBConnection;
 
 import java.sql.Connection;
@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class StudentRank {
-    public static ArrayList<StudentRankRequestDTO.StudentRankDTO> getStudentsOrderedByRank() {
+    public static ArrayList<StudentRankResponseDTO.StudentRankDTO> getStudentsOrderedByRank() {
 
         try{
             Connection conn = DBConnection.getDbPool().getConnection();
@@ -20,7 +20,7 @@ public class StudentRank {
 
             // Result
             ResultSet rs = pstmt.executeQuery();
-            ArrayList<StudentRankRequestDTO.StudentRankDTO> result = new ArrayList<>();
+            ArrayList<StudentRankResponseDTO.StudentRankDTO> result = new ArrayList<>();
 
             while (rs.next()) {
                 int rank_ingroup = rs.getInt("rank_ingroup");
@@ -30,11 +30,12 @@ public class StudentRank {
                 int solvednum = rs.getInt("solvednum");
 
                 // Add the row data to the result list
-                result.add(new StudentRankRequestDTO.StudentRankDTO(rank_ingroup, handle, userlink, tier, solvednum));
+                result.add(new StudentRankResponseDTO.StudentRankDTO(rank_ingroup, handle, userlink, tier, solvednum));
             }
             rs.close();
             pstmt.close();
             conn.close();
+
             return result;
 
         } catch (SQLException e){

@@ -13,13 +13,13 @@ public class ProblemResponseDTO {
         @JsonProperty
         int solvednum;
         @JsonProperty
-        String tier;
+        int tier;
 
         public ProblemAlgoDTO(@JsonProperty("pid") int pid,
                                    @JsonProperty("p_title") String p_title,
                                    @JsonProperty("link") String link,
                                    @JsonProperty("solvednum") int solvednum,
-                                   @JsonProperty("tier") String tier) {
+                                   @JsonProperty("tier") int tier) {
             this.pid = pid;
             this.p_title = p_title;
             this.link = link;
@@ -37,8 +37,6 @@ public class ProblemResponseDTO {
         String link;
         @JsonProperty
         int solvednum;
-        //@JsonProperty
-        //String algo;
 
         public ProblemTierDTO (@JsonProperty("pid") int pid,
                                @JsonProperty("p_title") String p_title,
