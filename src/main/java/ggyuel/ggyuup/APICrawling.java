@@ -23,13 +23,22 @@ public class APICrawling {
 	private static boolean[] solved = new boolean[35000];
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
+		long startTime = System.nanoTime();
 		crawlSchool();
+		long endTime = System.nanoTime();
+		System.out.println((endTime-startTime)/1000000000);
+		startTime = System.nanoTime();
 		for(String user : users) {
-			Thread.sleep(1000);
+			//Thread.sleep(1000);
 			crawlUser(user);
 		}
+		endTime = System.nanoTime();
+		System.out.println((endTime-startTime)/1000000000);
+		startTime = System.nanoTime();
 		crawlProblems();
-		Thread.sleep(20000);
+		endTime = System.nanoTime();
+		System.out.println((endTime-startTime)/1000000000);
+		System.out.print(users.size());
     }
 
     public static void crawlProblems() throws IOException {
@@ -44,7 +53,7 @@ public class APICrawling {
                 URL url = new URL(path);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
-                Thread.sleep(100);
+                //Thread.sleep(100);
                 if (conn.getResponseCode() != 200) {
                     continue;
                 }
@@ -96,23 +105,21 @@ public class APICrawling {
     }
 
     public static void crawlUser(String user) {
-    	String URL = "https://solved.ac/profile/"+user+"/solved?page=";
-    	int page = 1;
+    	String URL = "https://www.acmicpc.net/user/"+user;
         try {
-            while (true) {
-                Document Doc = Jsoup.connect(URL + page).get();
-                Elements pidtitle = Doc.getElementsByClass("css-q9j30p");
-                if (pidtitle.isEmpty()) {
-                    // 현재 페이지에 데이터가 없으면 반복을 종료합니다.
-                    break;
+                Document Doc = Jsoup.connect(URL).get();
+                Element problemListDiv = Doc.selectFirst("div.problem-list");
+                
+             // 문제 번호 텍스트 추출
+                if (problemListDiv != null) {
+                	 String[] problemNumbers = problemListDiv.text().split("\\s+");
+                     
+                     for (String number : problemNumbers) {
+                         solved[Integer.parseInt(number)] = true;
+                     }
+                } else {
+                    System.out.println("문제 목록을 찾을 수 없습니다.");
                 }
-                int i = 0;
-                for(Element pid : pidtitle) {
-                    if(++i % 2 == 0) continue; // 짝수번째 요소(문제제목)는 무시합니다.
-                    solved[Integer.parseInt(pid.text())] = true;
-                }
-                page++; // 다음 페이지로 이동합니다.
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
