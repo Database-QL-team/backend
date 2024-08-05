@@ -7,8 +7,8 @@ public class DBConnection {
     static {
         dbPool = new HikariDataSource();
         dbPool.setJdbcUrl("jdbc:mysql://localhost:3306/ewhabaekjoon");
-        dbPool.setUsername("jeongsoeun");
-        dbPool.setPassword("0000");
+        dbPool.setUsername("root");
+        dbPool.setPassword("1111");
 
         // 추가 설정
         dbPool.setMinimumIdle(5); // 최소 유휴 상태의 커넥션 수

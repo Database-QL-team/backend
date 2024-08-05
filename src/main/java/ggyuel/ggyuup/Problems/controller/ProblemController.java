@@ -1,0 +1,47 @@
+package ggyuel.ggyuup.Problems.controller;
+
+import ggyuel.ggyuup.Problems.service.ProblemAlgo;
+import ggyuel.ggyuup.Problems.service.ProblemTier;
+import ggyuel.ggyuup.Problems.dto.ProblemRequestDTO;
+import ggyuel.ggyuup.global.apiResponse.ApiResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+
+/**
+ * 문제 정렬 관련 요청을 처리하는 컨트롤러 클래스입니다.
+ */
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/problems")
+public class ProblemController {
+
+    /**
+     * 지정된 알고리즘 태그로 필터링된 문제 목록을 반환합니다.
+     *
+     * @param tag 필터링에 사용할 알고리즘 태그입니다.
+     * @return 성공 상태와 함께 필터링된 문제 목록을 포함하는 ApiResponse 객체입니다.
+     */
+    @GetMapping("/algo")
+    public ApiResponse<ArrayList<ProblemRequestDTO.ProblemAlgoDTO>> getProblemAlgo(@RequestParam("tag") String tag) {
+        // ProblemAlgo 서비스를 사용하여 지정된 태그로 문제를 가져옵니다
+        ArrayList<ProblemRequestDTO.ProblemAlgoDTO> problemAlgoList = ProblemAlgo.getProblemsByTag(tag);
+        // 성공 상태와 함께 ApiResponse로 문제 목록을 반환합니다
+        return ApiResponse.onSuccess(problemAlgoList);
+    }
+
+    /**
+     * 지정된 티어로 필터링된 문제 목록을 반환합니다.
+     *
+     * @param tier 필터링에 사용할 티어입니다.
+     * @return 성공 상태와 함께 필터링된 문제 목록을 포함하는 ApiResponse 객체입니다.
+     */
+    @GetMapping("/tier")
+    public ApiResponse<ArrayList<ProblemRequestDTO.ProblemTierDTO>> getProblemTier(@RequestParam("tier") int tier) {
+        // ProblemTier 서비스를 사용하여 지정된 티어로 문제를 가져옵니다
+        ArrayList<ProblemRequestDTO.ProblemTierDTO> problemTierList = ProblemTier.getProblemsByTier(tier);
+        // 성공 상태와 함께 ApiResponse로 문제 목록을 반환합니다
+        return ApiResponse.onSuccess(problemTierList);
+    }
+}
