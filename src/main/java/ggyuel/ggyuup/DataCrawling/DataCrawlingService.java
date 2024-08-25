@@ -27,9 +27,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 @Service
 public class DataCrawlingService {
-    static String address = "jdbc:mysql://localhost/DB2024Team01";
-    static String userid = "root";
-    static String passwd = "cs10120";
 
     private static ArrayList<String> users = new ArrayList<>();
     private static boolean[] solved = new boolean[35000];
@@ -55,7 +52,7 @@ public class DataCrawlingService {
 
     public static void crawlProblems() {
         try(
-                Connection DBconn = DriverManager.getConnection(address, userid, passwd);
+                Connection DBconn = DBConnection.getDbPool().getConnection();
                 PreparedStatement pstmtPro = DBconn.prepareStatement("INSERT INTO DB2024_Problems(pid, ptitle, tier, solvednum, link) VALUES (?,?,?,?,?)");
                 PreparedStatement pstmtAlgo = DBconn.prepareStatement("INSERT INTO DB2024_Algorithms(pid, tag) VALUES (?,?)");
                 Statement stmt = DBconn.createStatement();
@@ -93,7 +90,7 @@ public class DataCrawlingService {
 
                         int pid = ((JSONObject)item).getInt("problemId");
                         if(solved[pid]) continue;
-                        
+
                         String ptitle = ((JSONObject)item).getString("titleKo");
                         int tier = ((JSONObject)item).getInt("level");
                         int solvednum = ((JSONObject)item).getInt("acceptedUserCount");
