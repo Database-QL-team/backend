@@ -34,7 +34,7 @@ public class DataCrawlingService {
     private static ArrayList<String> users = new ArrayList<>();
     private static boolean[] solved = new boolean[35000];
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 30 23 * * ?")
     public static void RefreshAllData() throws InterruptedException, IOException {
         long startTime = System.nanoTime();
         crawlSchool();
@@ -51,7 +51,6 @@ public class DataCrawlingService {
         crawlProblems();
         endTime = System.nanoTime();
         System.out.println("안 푼 문제 목록을 가져오는데 걸린 시간(초): "+(endTime-startTime)/1000000000.0);
-        System.out.print(users.size());
     }
 
     public static void crawlProblems() {
@@ -90,13 +89,14 @@ public class DataCrawlingService {
 
                     JSONArray itemlist = jsonResponse.getJSONArray("items");
                     for(Object item : itemlist) {
+                        if(((JSONObject)item).getBoolean("official") == false) continue;
 
-                        int pid = (int) ((JSONObject)item).get("problemId");
+                        int pid = ((JSONObject)item).getInt("problemId");
                         if(solved[pid]) continue;
-
-                        String ptitle = (String)((JSONObject)item).get("titleKo");
-                        int tier = (int)((JSONObject)item).get("level");
-                        int solvednum = (int)((JSONObject)item).get("acceptedUserCount");
+                        System.out.println(pid);
+                        String ptitle = ((JSONObject)item).getString("titleKo");
+                        int tier = ((JSONObject)item).getInt("level");
+                        int solvednum = ((JSONObject)item).getInt("acceptedUserCount");
                         String link = "https://www.acmicpc.net/problem/"+pid;
 
                         pstmtPro.setInt(1,pid);
@@ -113,7 +113,7 @@ public class DataCrawlingService {
                         }
                         for(Object tag : tags){
                             JSONArray displayNames = ((JSONObject)tag).getJSONArray("displayNames");
-                            String name = (String)displayNames.getJSONObject(0).get("name");
+                            String name = displayNames.getJSONObject(0).getString("short");
 
                             pstmtAlgo.setInt(1, pid);
                             pstmtAlgo.setString(2, name);
