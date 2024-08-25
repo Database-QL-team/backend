@@ -93,7 +93,7 @@ public class DataCrawlingService {
 
                         int pid = ((JSONObject)item).getInt("problemId");
                         if(solved[pid]) continue;
-                        System.out.println(pid);
+                        
                         String ptitle = ((JSONObject)item).getString("titleKo");
                         int tier = ((JSONObject)item).getInt("level");
                         int solvednum = ((JSONObject)item).getInt("acceptedUserCount");
