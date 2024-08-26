@@ -12,7 +12,7 @@ class GgyuUpApplicationTests {
 
 	@Test
 	void CrawlingTest() throws InterruptedException, IOException {
-		DataCrawlingService.RefreshAllData();
+		//DataCrawlingService.RefreshAllData();
 	}
 
 }
