@@ -22,35 +22,51 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.scheduling.annotation.Scheduled;
 
 @Service
 public class DataCrawlingService {
-
+    private final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
     private static ArrayList<String> users = new ArrayList<>();
     private static boolean[] solved = new boolean[35000];
 
-    @Scheduled(cron = "0 30 23 * * ?")
-    public static void RefreshAllData() throws InterruptedException, IOException {
+    @Scheduled(cron = "10 36 19 * * ?")
+    public void RefreshAllData() throws InterruptedException, IOException
+    {
         long startTime = System.nanoTime();
-        crawlSchool();
+        crawlGroups();
         long endTime = System.nanoTime();
-        System.out.println("전체 학생 목록을 가져오는데 걸린 시간(초): "+(endTime-startTime)/1000000000.0);
+        log.info("그룹 랭킹을 가져오는데 걸린 시간(초): " + (endTime-startTime)/1000000000.0);
+
+        startTime = System.nanoTime();
+        crawlSchool();
+        endTime = System.nanoTime();
+        log.info("전체 학생 목록을 가져오는데 걸린 시간(초): " + (endTime-startTime)/1000000000.0);
+
         startTime = System.nanoTime();
         for(String user : users) {
             //Thread.sleep(1000);
             crawlUser(user);
         }
         endTime = System.nanoTime();
-        System.out.println("학생들이 이미 푼 문제들을 스캔하는데 걸린 시간(초): "+(endTime-startTime)/1000000000.0);
+        log.info("학생들이 이미 푼 문제들을 찾는데 걸린 시간(초): " + (endTime-startTime)/1000000000.0);
+
+        int solvedNum = 0;
+        for(boolean isSolved: solved){
+            if(isSolved) solvedNum++;
+        }
+        log.info("학생들이 푼 문제 수: " + solvedNum);
+
         startTime = System.nanoTime();
         crawlProblems();
         endTime = System.nanoTime();
-        System.out.println("안 푼 문제 목록을 가져오는데 걸린 시간(초): "+(endTime-startTime)/1000000000.0);
+        log.info("안 푼 문제 목록을 가져오는데 걸린 시간(초): " + (endTime-startTime)/1000000000.0);
     }
 
-    public static void crawlProblems() {
+    void crawlProblems() {
         try(
                 Connection DBconn = DBConnection.getDbPool().getConnection();
                 PreparedStatement pstmtPro = DBconn.prepareStatement("INSERT INTO DB2024_Problems(pid, ptitle, tier, solvednum, link) VALUES (?,?,?,?,?)");
@@ -117,8 +133,10 @@ public class DataCrawlingService {
                             pstmtAlgo.executeUpdate();
                         }
                     }
+                } catch (HttpStatusException e) {
+                    log.error(e.getMessage());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage());
                 }
             }
             DBconn.commit();
@@ -128,7 +146,7 @@ public class DataCrawlingService {
         }
     }
 
-    public static void crawlUser(String user) {
+    void crawlUser(String user) {
         String URL = "https://www.acmicpc.net/user/"+user;
         try {
             Document Doc = Jsoup.connect(URL).get();
@@ -143,25 +161,63 @@ public class DataCrawlingService {
                     solved[Integer.parseInt(number)] = true;
                 }
             } else {
-                System.out.println("문제 목록을 찾을 수 없습니다.");
+                log.error("문제 목록을 찾을 수 없습니다: " + URL);
             }
+        } catch (HttpStatusException e) {
+            log.error(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
-    static void crawlSchool() {
+    void crawlSchool() {
         int school_id = 352; // EWHA WOMANS UNIVERSITY
         String URL = "https://solved.ac/ranking/o/"+school_id+"?page=";
-        for (int page = 1; page < 15; page++) {
-            try {
-                Document Doc = Jsoup.connect(URL+page).get();
+        try(
+                Connection DBconn = DBConnection.getDbPool().getConnection();
+                PreparedStatement pstmt = DBconn.prepareStatement("INSERT INTO DB2024_Students(handle, userlink, solvednum, tier, rank_ingroup) VALUES (?,?,?,?,?)");
+        )
+        {
+            for (int page = 1; page < 15; page++) {
+                Document Doc = Jsoup.connect(URL + page).get();
                 Elements es = Doc.getElementsByClass("css-oo6qmd");
-                for(Element e : es) {
+                for (Element e : es) {
                     users.add(e.text());
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
     }
+
+    public void crawlGroups()
+    {
+        String URL = "https://www.acmicpc.net/ranklist/school/";
+
+        try(
+                Connection DBconn = DBConnection.getDbPool().getConnection();
+                PreparedStatement pstmt = DBconn.prepareStatement("insert into DB2024_Organizations (groupname, solvedNum, ranking) values(?,?,?)");
+        )
+        {
+            DBconn.setAutoCommit(false);
+
+            for(int i=1; i<=2; i++) {
+                Document doc = Jsoup.connect(URL+i).get();
+                for(int j=1; j<=100; j++) {
+                    Element name = doc.selectFirst("#ranklist > tbody > tr:nth-child("+j+") > td:nth-child(2) > a");
+                    Element solvednum = doc.selectFirst("#ranklist > tbody > tr:nth-child("+j+") > td:nth-child(4) > a");
+                    pstmt.setString(1,name.text());
+                    pstmt.setInt(2,Integer.parseInt(solvednum.text()));
+                    pstmt.setInt(3,j + (i-1)*100);
+                    pstmt.executeUpdate();
+                }
+            }
+
+            DBconn.commit();
+            DBconn.setAutoCommit(true);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
+
 }
