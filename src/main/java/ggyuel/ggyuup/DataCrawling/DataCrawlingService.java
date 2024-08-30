@@ -33,12 +33,17 @@ public class DataCrawlingService {
     private static ArrayList<String> users = new ArrayList<>();
     private static boolean[] solved = new boolean[35000];
 
-    @Scheduled(cron = "0 30 11 * * ?")
+    @Scheduled(cron = "10 36 19 * * ?")
     public void RefreshAllData() throws InterruptedException, IOException
     {
         long startTime = System.nanoTime();
-        crawlSchool();
+        crawlGroups();
         long endTime = System.nanoTime();
+        log.info("그룹 랭킹을 가져오는데 걸린 시간(초): " + (endTime-startTime)/1000000000.0);
+
+        startTime = System.nanoTime();
+        crawlSchool();
+        endTime = System.nanoTime();
         log.info("전체 학생 목록을 가져오는데 걸린 시간(초): " + (endTime-startTime)/1000000000.0);
 
         startTime = System.nanoTime();
@@ -167,16 +172,52 @@ public class DataCrawlingService {
     void crawlSchool() {
         int school_id = 352; // EWHA WOMANS UNIVERSITY
         String URL = "https://solved.ac/ranking/o/"+school_id+"?page=";
-        for (int page = 1; page < 15; page++) {
-            try {
-                Document Doc = Jsoup.connect(URL+page).get();
+        try(
+                Connection DBconn = DBConnection.getDbPool().getConnection();
+                PreparedStatement pstmt = DBconn.prepareStatement("INSERT INTO DB2024_Students(handle, userlink, solvednum, tier, rank_ingroup) VALUES (?,?,?,?,?)");
+        )
+        {
+            for (int page = 1; page < 15; page++) {
+                Document Doc = Jsoup.connect(URL + page).get();
                 Elements es = Doc.getElementsByClass("css-oo6qmd");
-                for(Element e : es) {
+                for (Element e : es) {
                     users.add(e.text());
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
     }
+
+    public void crawlGroups()
+    {
+        String URL = "https://www.acmicpc.net/ranklist/school/";
+
+        try(
+                Connection DBconn = DBConnection.getDbPool().getConnection();
+                PreparedStatement pstmt = DBconn.prepareStatement("insert into DB2024_Organizations (groupname, solvedNum, ranking) values(?,?,?)");
+        )
+        {
+            DBconn.setAutoCommit(false);
+
+            for(int i=1; i<=2; i++) {
+                Document doc = Jsoup.connect(URL+i).get();
+                for(int j=1; j<=100; j++) {
+                    Element name = doc.selectFirst("#ranklist > tbody > tr:nth-child("+j+") > td:nth-child(2) > a");
+                    Element solvednum = doc.selectFirst("#ranklist > tbody > tr:nth-child("+j+") > td:nth-child(4) > a");
+                    pstmt.setString(1,name.text());
+                    pstmt.setInt(2,Integer.parseInt(solvednum.text()));
+                    pstmt.setInt(3,j + (i-1)*100);
+                    pstmt.executeUpdate();
+                }
+            }
+
+            DBconn.commit();
+            DBconn.setAutoCommit(true);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
+
 }
