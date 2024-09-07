@@ -13,9 +13,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -33,9 +36,10 @@ public class DataCrawlingService {
     private static ArrayList<String> users = new ArrayList<>();
     private static boolean[] solved = new boolean[35000];
 
-    @Scheduled(cron = "10 36 19 * * ?")
+    @Scheduled(cron = "00 30 11 * * ?")
     public void RefreshAllData() throws InterruptedException, IOException
     {
+        log.info("크롤링 시작...");
         long startTime = System.nanoTime();
         crawlGroups();
         long endTime = System.nanoTime();
@@ -64,42 +68,37 @@ public class DataCrawlingService {
         crawlProblems();
         endTime = System.nanoTime();
         log.info("안 푼 문제 목록을 가져오는데 걸린 시간(초): " + (endTime-startTime)/1000000000.0);
+        log.info("크롤링 종료");
     }
 
     void crawlProblems() {
         try(
                 Connection DBconn = DBConnection.getDbPool().getConnection();
-                PreparedStatement pstmtPro = DBconn.prepareStatement("INSERT INTO DB2024_Problems(pid, ptitle, tier, solvednum, link) VALUES (?,?,?,?,?)");
-                PreparedStatement pstmtAlgo = DBconn.prepareStatement("INSERT INTO DB2024_Algorithms(pid, tag) VALUES (?,?)");
+                PreparedStatement pstmtPro = DBconn.prepareStatement("INSERT INTO Problems(problem_id, title, tier, solved_num, link) VALUES (?,?,?,?,?)");
+                PreparedStatement pstmtAlgo = DBconn.prepareStatement("INSERT INTO ProAlgo(problem_id, algo_id) VALUES (?,?)");
                 Statement stmt = DBconn.createStatement();
         )
         {
             DBconn.setAutoCommit(false);
-            stmt.executeUpdate("delete from DB2024_Algorithms");
-            stmt.executeUpdate("delete from DB2024_Problems");
+            stmt.executeUpdate("delete from ProAlgo");
+            stmt.executeUpdate("delete from Problems");
 
-            for (int page = 1; page <= 600; page++) {
+            int MaxPage = 1;
+            for (int page = 1; page <= MaxPage; page++) {
                 try {
                     String path = "https://solved.ac/api/v3/search/problem?query=+&page=" + page + "&sort=id&direction=asc";
-                    URL url = new URL(path);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("GET");
-                    //Thread.sleep(100);
-                    if (conn.getResponseCode() != 200) {
-                        continue;
-                    }
+                    HttpRequest request = HttpRequest.newBuilder()
+                            .uri(URI.create(path))
+                            .header("x-solvedac-language", "")
+                            .header("Accept", "application/json")
+                            .method("GET", HttpRequest.BodyPublishers.noBody())
+                            .build();
+                    HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                    String line;
-                    StringBuilder response = new StringBuilder();
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
-                    reader.close();
-
-                    JSONObject jsonResponse = new JSONObject(response.toString());
+                    JSONObject jsonResponse = new JSONObject(response.body());
                     // 데이터 처리는 여기서...
 
+                    MaxPage = jsonResponse.getInt("count") / 50 + 1;
                     JSONArray itemlist = jsonResponse.getJSONArray("items");
                     for(Object item : itemlist) {
                         if(((JSONObject)item).getBoolean("official") == false) continue;
@@ -169,23 +168,52 @@ public class DataCrawlingService {
             log.error(e.getMessage());
         }
     }
+
     void crawlSchool() {
         int school_id = 352; // EWHA WOMANS UNIVERSITY
-        String URL = "https://solved.ac/ranking/o/"+school_id+"?page=";
+        String URL = "https://solved.ac/api/v3/ranking/in_organization?organizationId="+school_id;
+
+        int page = 1;
         try(
                 Connection DBconn = DBConnection.getDbPool().getConnection();
-                PreparedStatement pstmt = DBconn.prepareStatement("INSERT INTO DB2024_Students(handle, userlink, solvednum, tier, rank_ingroup) VALUES (?,?,?,?,?)");
+                Statement stmt = DBconn.createStatement();
+                PreparedStatement pstmt = DBconn.prepareStatement("INSERT INTO Students(handle, link, solved_num, ranking, tier) VALUES (?,?,?,?,?)");
         )
         {
-            for (int page = 1; page < 15; page++) {
-                Document Doc = Jsoup.connect(URL + page).get();
-                Elements es = Doc.getElementsByClass("css-oo6qmd");
-                for (Element e : es) {
-                    users.add(e.text());
+            DBconn.setAutoCommit(false);
+            stmt.executeUpdate("delete from Students");
+
+            int MaxPage = 1;
+            for (page = 1; page <= MaxPage; page++) {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(URL+"&page="+page))
+                        .header("Accept", "application/json")
+                        .method("GET", HttpRequest.BodyPublishers.noBody())
+                        .build();
+                HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+                JSONObject jsonResponse = new JSONObject(response.body());
+                MaxPage = jsonResponse.getInt("count") / 50 + 1;
+                JSONArray items = jsonResponse.getJSONArray("items");
+
+                for(Object item : items) {
+                    JSONObject user = (JSONObject)item;
+
+                    String handle = user.getString("handle");
+                    users.add(handle);
+
+                    pstmt.setString(1, handle);
+                    pstmt.setString(2, "https://solved.ac/profile/" + handle);
+                    pstmt.setInt(3, user.getInt("solvedCount"));
+                    pstmt.setInt(4, user.getInt("rank"));
+                    pstmt.setInt(5, user.getInt("tier"));
+                    pstmt.executeUpdate();
                 }
             }
+
+            DBconn.commit();
+            DBconn.setAutoCommit(true);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage()+" at page "+page);
         }
     }
 
@@ -195,10 +223,12 @@ public class DataCrawlingService {
 
         try(
                 Connection DBconn = DBConnection.getDbPool().getConnection();
-                PreparedStatement pstmt = DBconn.prepareStatement("insert into DB2024_Organizations (groupname, solvedNum, ranking) values(?,?,?)");
+                Statement stmt = DBconn.createStatement();
+                PreparedStatement pstmt = DBconn.prepareStatement("insert into Organizations (group_name, solved_num, ranking) values(?,?,?)");
         )
         {
             DBconn.setAutoCommit(false);
+            stmt.executeUpdate("delete from Organizations");
 
             for(int i=1; i<=2; i++) {
                 Document doc = Jsoup.connect(URL+i).get();
