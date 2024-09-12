@@ -34,9 +34,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 public class DataCrawlingService {
     private final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
     private static ArrayList<String> users = new ArrayList<>();
-    private static boolean[] solved = new boolean[35000];
+    private static boolean[] solved = new boolean[40000];
 
-    @Scheduled(cron = "00 30 11 * * ?")
+    @Scheduled(cron = "15 5 20 * * ?")
     public void RefreshAllData() throws InterruptedException, IOException
     {
         log.info("크롤링 시작...");
@@ -48,7 +48,7 @@ public class DataCrawlingService {
         startTime = System.nanoTime();
         crawlSchool();
         endTime = System.nanoTime();
-        log.info("전체 학생 목록을 가져오는데 걸린 시간(초): " + (endTime-startTime)/1000000000.0);
+        log.info("상위 500명의 학생 목록을 가져오는데 걸린 시간(초): " + (endTime-startTime)/1000000000.0);
 
         startTime = System.nanoTime();
         for(String user : users) {
@@ -56,13 +56,13 @@ public class DataCrawlingService {
             crawlUser(user);
         }
         endTime = System.nanoTime();
-        log.info("학생들이 이미 푼 문제들을 찾는데 걸린 시간(초): " + (endTime-startTime)/1000000000.0);
+        log.info("상위 500명이 이미 푼 문제들을 찾는데 걸린 시간(초): " + (endTime-startTime)/1000000000.0);
 
         int solvedNum = 0;
         for(boolean isSolved: solved){
             if(isSolved) solvedNum++;
         }
-        log.info("학생들이 푼 문제 수: " + solvedNum);
+        log.info("이미 푼 문제 수: " + solvedNum);
 
         startTime = System.nanoTime();
         crawlProblems();
@@ -132,10 +132,8 @@ public class DataCrawlingService {
                             pstmtAlgo.executeUpdate();
                         }
                     }
-                } catch (HttpStatusException e) {
-                    log.error(e.getMessage());
                 } catch (Exception e) {
-                    log.error(e.getMessage());
+                    log.error(page+" page: "+e.getMessage());
                 }
             }
             DBconn.commit();
@@ -160,58 +158,28 @@ public class DataCrawlingService {
                     solved[Integer.parseInt(number)] = true;
                 }
             } else {
-                log.error("문제 목록을 찾을 수 없습니다: " + URL);
+                log.error("문제 목록을 찾을 수 없습니다: " + user);
             }
-        } catch (HttpStatusException e) {
-            log.error(e.getMessage());
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage() + user);
         }
     }
 
     void crawlSchool() {
         int school_id = 352; // EWHA WOMANS UNIVERSITY
-        String URL = "https://solved.ac/api/v3/ranking/in_organization?organizationId="+school_id;
+        String URL = "https://www.acmicpc.net/school/ranklist/"+school_id+"/";
 
         int page = 1;
-        try(
-                Connection DBconn = DBConnection.getDbPool().getConnection();
-                Statement stmt = DBconn.createStatement();
-                PreparedStatement pstmt = DBconn.prepareStatement("INSERT INTO Students(handle, link, solved_num, ranking, tier) VALUES (?,?,?,?,?)");
-        )
-        {
-            DBconn.setAutoCommit(false);
-            stmt.executeUpdate("delete from Students");
-
-            int MaxPage = 1;
+        int MaxPage = 5;
+        try{
             for (page = 1; page <= MaxPage; page++) {
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(URL+"&page="+page))
-                        .header("Accept", "application/json")
-                        .method("GET", HttpRequest.BodyPublishers.noBody())
-                        .build();
-                HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-                JSONObject jsonResponse = new JSONObject(response.body());
-                MaxPage = jsonResponse.getInt("count") / 50 + 1;
-                JSONArray items = jsonResponse.getJSONArray("items");
+                Document doc = Jsoup.connect(URL+page).get();
 
-                for(Object item : items) {
-                    JSONObject user = (JSONObject)item;
-
-                    String handle = user.getString("handle");
-                    users.add(handle);
-
-                    pstmt.setString(1, handle);
-                    pstmt.setString(2, "https://solved.ac/profile/" + handle);
-                    pstmt.setInt(3, user.getInt("solvedCount"));
-                    pstmt.setInt(4, user.getInt("rank"));
-                    pstmt.setInt(5, user.getInt("tier"));
-                    pstmt.executeUpdate();
+                for(int i=1; i<=100; i++) {
+                    Element name = doc.selectFirst("#ranklist > tbody > tr:nth-child("+i+") > td:nth-child(2) > a");
+                    users.add(name.text());
                 }
             }
-
-            DBconn.commit();
-            DBconn.setAutoCommit(true);
         } catch (Exception e) {
             log.error(e.getMessage()+" at page "+page);
         }
