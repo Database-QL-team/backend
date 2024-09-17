@@ -19,10 +19,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import java.sql.*;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
@@ -36,7 +34,7 @@ public class DataCrawlingService {
     private static ArrayList<String> users = new ArrayList<>();
     private static boolean[] solved = new boolean[40000];
 
-    @Scheduled(cron = "15 5 20 * * ?")
+    @Scheduled(cron = "15 30 11 * * ?")
     public void RefreshAllData() throws InterruptedException, IOException
     {
         log.info("크롤링 시작...");
@@ -75,18 +73,20 @@ public class DataCrawlingService {
         try(
                 Connection DBconn = DBConnection.getDbPool().getConnection();
                 PreparedStatement pstmtPro = DBconn.prepareStatement("INSERT INTO Problems(problem_id, title, tier, solved_num, link) VALUES (?,?,?,?,?)");
-                PreparedStatement pstmtAlgo = DBconn.prepareStatement("INSERT INTO ProAlgo(problem_id, algo_id) VALUES (?,?)");
+                PreparedStatement pstmtAlgo = DBconn.prepareStatement("INSERT INTO ProAlgo(pro_algo_id, problem_id, algo_id) VALUES (?,?,?)");
                 Statement stmt = DBconn.createStatement();
         )
         {
             DBconn.setAutoCommit(false);
+            stmt.executeUpdate("delete from TodayPs");
             stmt.executeUpdate("delete from ProAlgo");
             stmt.executeUpdate("delete from Problems");
 
             int MaxPage = 1;
+            int pro_algo_id = 1;
             for (int page = 1; page <= MaxPage; page++) {
                 try {
-                    String path = "https://solved.ac/api/v3/search/problem?query=+&page=" + page + "&sort=id&direction=asc";
+                    String path = "https://solved.ac/api/v3/search/problem?query=+&page=" + page;
                     HttpRequest request = HttpRequest.newBuilder()
                             .uri(URI.create(path))
                             .header("x-solvedac-language", "")
@@ -127,19 +127,47 @@ public class DataCrawlingService {
                             JSONArray displayNames = ((JSONObject)tag).getJSONArray("displayNames");
                             String name = displayNames.getJSONObject(0).getString("short");
 
-                            pstmtAlgo.setInt(1, pid);
-                            pstmtAlgo.setString(2, name);
+                            pstmtAlgo.setInt(1, pro_algo_id);
+                            pstmtAlgo.setInt(2, pid);
+                            pstmtAlgo.setString(3, name);
                             pstmtAlgo.executeUpdate();
+                            pro_algo_id++;
                         }
                     }
-                } catch (Exception e) {
-                    log.error(page+" page: "+e.getMessage());
+                } catch (HttpStatusException e) {
+                    log.error("HTTP error "+page+" page: "+e.getMessage());
+                } catch (SQLException e) {
+                    log.error("SQL error "+page+" page: "+e.getMessage());
                 }
             }
+            insertTodayPs(DBconn);
             DBconn.commit();
             DBconn.setAutoCommit(true);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+        }
+    }
+
+    public void insertTodayPs(Connection conn) {
+        //deleteTodayPs();
+        try(PreparedStatement pstmt = conn.prepareStatement("INSERT INTO TodayPs (problem_id) " +
+                     "SELECT p.problem_id " +
+                     "FROM Problems p " +
+                     "JOIN (" +
+                     "    SELECT tier, MAX(solved_num) AS max_solved_num " +
+                     "    FROM Problems " +
+                     "    WHERE tier >= 1 AND tier <= 19 " +
+                     "    GROUP BY tier " +
+                     ") max_solved " +
+                     "ON p.tier = max_solved.tier AND p.solved_num = max_solved.max_solved_num " +
+                     "WHERE p.tier >= 1 AND p.tier <= 19 " +
+                     "ORDER BY p.tier");
+        ){
+
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
     }
 
