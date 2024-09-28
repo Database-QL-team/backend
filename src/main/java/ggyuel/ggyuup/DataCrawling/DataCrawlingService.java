@@ -97,8 +97,8 @@ public class DataCrawlingService {
 
                     JSONObject jsonResponse = new JSONObject(response.body());
                     // 데이터 처리는 여기서...
-                    log.info("안 푼 문제 가져오기: " + page + "/" + MaxPage + "page");
                     MaxPage = jsonResponse.getInt("count") / 50 + 1;
+                    log.info("안 푼 문제 가져오기: " + page + "/" + MaxPage + " page");
                     JSONArray itemlist = jsonResponse.getJSONArray("items");
                     for(Object item : itemlist) {
                         if(((JSONObject)item).getBoolean("official") == false) continue;
