@@ -29,7 +29,7 @@ public class MainResponseDTO {
          *
          * @param ewhaRank       이화 랭킹
          * @param rivalRank      전 순위 그룹의 백준 랭킹
-         * @param rivalName   전 순위 그룹의 이름
+         * @param rivalName      전 순위 그룹의 이름
          * @param solvedNumGap     전 순위 그룹과 푼 문제 수 차이
          */
         public GroupInfoDTO (@JsonProperty("ewhaRank") int ewhaRank,
@@ -46,40 +46,35 @@ public class MainResponseDTO {
     /**
      * TodayPSDTO 클래스는 오늘의 문제 정보를 나타냅니다.
      */
-//    public static class TodayPSDTO {
-//
-//        @JsonProperty
-//        int pid; // 문제 번호
-//        @JsonProperty
-//        String dib_handle; // 찜하기 한 사용자의 핸들
-//        @JsonProperty
-//        int dib; // 찜하기 여부
-//        @JsonProperty
-//        String p_title; // 문제 제목
-//        @JsonProperty
-//        int p_tier; // 문제 티어
-//
-//        /**
-//         * TodayPSDTO 생성자.
-//         *
-//         * @param pid        문제 번호
-//         * @param p_title    문제 제목
-//         * @param p_tier     문제 티어
-//         * @param dib        찜하기 여부
-//         * @param dib_handle 찜하기 한 사용자의 핸들
-//         */
-//        public TodayPSDTO(@JsonProperty("pid") int pid,
-//                          @JsonProperty("p_title") String p_title,
-//                          @JsonProperty("p_tier") int p_tier,
-//                          @JsonProperty("dib") int dib,
-//                          @JsonProperty("dib_handle") String dib_handle) {
-//            this.pid = pid;
-//            this.dib_handle = dib_handle;
-//            this.dib = dib;
-//            this.p_title = p_title;
-//            this.p_tier = p_tier;
-//        }
-//    }
+    public static class TodayPSDTO {
+        @JsonProperty
+        String title; // 문제 제목
+        @JsonProperty
+        String link;
+        @JsonProperty
+        int tier; // 문제 티어
+        @JsonProperty
+        int solvedNum;
+
+        /**
+         * TodayPSDTO 생성자.
+         *
+         * @param link     문제 링크
+         * @param title    문제 제목
+         * @param tier     문제 티어
+         * @param solvedNum 푼 사람 수
+         */
+        public TodayPSDTO(
+                          @JsonProperty("title") String title,
+                          @JsonProperty("link") String link,
+                          @JsonProperty("tier") int tier,
+                          @JsonProperty("solvedNum") int solvedNum) {
+            this.title = title;
+            this.link = link;
+            this.tier = tier;
+            this.solvedNum = solvedNum;
+        }
+    }
 
     /**
      * MainPageDTO 클래스는 메인 페이지의 정보를 포함합니다.
@@ -87,7 +82,7 @@ public class MainResponseDTO {
      */
     public static class MainPageDTO {
         private GroupInfoDTO groupInfo; // 그룹 정보
-        //private ArrayList<TodayPSDTO> todayPSList; // 오늘의 문제 리스트
+        private ArrayList<TodayPSDTO> todayPSList; // 오늘의 문제 리스트
 
         /**
          * 그룹 정보를 반환합니다.
@@ -112,18 +107,18 @@ public class MainResponseDTO {
          *
          * @return 오늘의 문제 리스트
          */
-        //public ArrayList<TodayPSDTO> getTodayPSList() {
-//            return todayPSList;
-//        }
+        public ArrayList<TodayPSDTO> getTodayPSList() {
+            return todayPSList;
+        }
 
         /**
          * 오늘의 문제 리스트를 설정합니다.
          *
          * @param todayPSList 오늘의 문제 리스트
          */
-        //public void setTodayPSList(ArrayList<TodayPSDTO> todayPSList) {
-//            this.todayPSList = todayPSList;
-//        }
+        public void setTodayPSList(ArrayList<TodayPSDTO> todayPSList) {
+            this.todayPSList = todayPSList;
+        }
     }
 }
 

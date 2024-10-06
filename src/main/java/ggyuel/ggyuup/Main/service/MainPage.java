@@ -31,32 +31,32 @@ public class MainPage {
 
             // 이화여자대학교의 랭킹 및 푼 문제 수 조회
             PreparedStatement pstmt1 = conn.prepareStatement(
-                    "SELECT org_rank, solved_num "
+                    "SELECT ranking, solved_num "
                             + "FROM organizations "
-                            + "WHERE name = ?");
+                            + "WHERE group_name = ?");
 
             pstmt1.setString(1, "이화여자대학교");
             ResultSet rs1 = pstmt1.executeQuery();
 
             // DB에서 추출한 이화여자대학교 튜플에서 org_rank과 solved_num 칼럼 정보 각각 ewhaRank, ewhaSolvedNum 변수에 저장
             if (rs1.next()) {
-                ewhaRank = rs1.getInt("org_rank");
+                ewhaRank = rs1.getInt("ranking");
                 ewhaSolvedNum = rs1.getInt("solved_num");
             }
 
             // 전 순위 그룹의 랭킹, 이름, 해결된 문제 수 조회
             PreparedStatement pstmt2 = conn.prepareStatement(
-                    "SELECT org_rank, name, solved_num "
+                    "SELECT ranking, group_name, solved_num "
                             + "FROM organizations "
-                            + "WHERE org_rank = ((SELECT org_rank FROM organizations WHERE name = ?) - 1)");
+                            + "WHERE ranking = ((SELECT ranking FROM organizations WHERE group_name = ?) - 1)");
 
             pstmt2.setString(1, "이화여자대학교");
             ResultSet rs2 = pstmt2.executeQuery();
 
             // DB에서 추출한 전 순위 그룹 튜플에서 groupname, ranking과 solvednum 칼럼 정보 각각 rival_group_name, rival_ranking, rival_solvednum 변수에 저장
             if (rs2.next()) {
-                rivalName = rs2.getString("name");
-                rivalRank = rs2.getInt("org_rank");
+                rivalName = rs2.getString("group_name");
+                rivalRank = rs2.getInt("ranking");
                 rivalSolvedNum = rs2.getInt("solved_num");
             }
 
@@ -80,45 +80,45 @@ public class MainPage {
         return null;
     }
 
-//    /**
-//     * 오늘의 문제 리스트를 가져오는 메서드입니다.
-//     *
-//     * @return 오늘의 문제 리스트를 담은 ArrayList
-//     */
-//    public static ArrayList<MainResponseDTO.TodayPSDTO> getTodayPS() {
-//        try {
-//            // 데이터베이스 연결
-//            Connection conn = DBConnection.getDbPool().getConnection();
-//            Statement stmt = conn.createStatement();
-//            ArrayList<MainResponseDTO.TodayPSDTO> TodayPSlist = new ArrayList<>();
-//
-//            // 오늘의 문제 조회
-//            ResultSet rs = stmt.executeQuery("SELECT * "
-//                    + "FROM DB2024_Problems NATURAL JOIN DB2024_TodayPS "
-//                    + "ORDER BY tier");
-//
-//            // 결과를 TodayPSDTO 객체로 변환하여 리스트에 추가
-//            while (rs.next()) {
-//                int pid = rs.getInt("pid");
-//                String pTitle = rs.getString("pTitle");
-//                int tier = rs.getInt("tier");
-//                int picked = rs.getInt("picked"); // null값일 수 있으므로 wrapper
-//                String handle = rs.getString("handle");
-//
-//                TodayPSlist.add(new MainResponseDTO.TodayPSDTO(pid, pTitle, tier, picked, handle));
-//            }
-//
-//            // 자원 해제
-//            rs.close();
-//            conn.close();
-//
-//            return TodayPSlist;  // 브론즈 5개, 실버 5개, 골드 5개 순서로 반환
-//
-//        } catch (SQLException e) {
-//            System.out.println(e);
-//        }
-//        return null;
-//    }
+    /**
+     * 오늘의 문제 리스트를 가져오는 메서드입니다.
+     *
+     * @return 오늘의 문제 리스트를 담은 ArrayList
+     */
+    public static ArrayList<MainResponseDTO.TodayPSDTO> getTodayPS() {
+        try {
+            // 데이터베이스 연결
+            Connection conn = DBConnection.getDbPool().getConnection();
+            Statement stmt = conn.createStatement();
+            ArrayList<MainResponseDTO.TodayPSDTO> TodayPSlist = new ArrayList<>();
+
+            // 오늘의 문제 조회
+            ResultSet rs = stmt.executeQuery(
+                    "SELECT title, link, tier, solved_num "
+                    + "FROM problems NATURAL JOIN todayps"
+                    + "ORDER BY tier");
+
+            // 결과를 TodayPSDTO 객체로 변환하여 리스트에 추가
+            while (rs.next()) {
+                String title = rs.getString("title");
+                String link = rs.getString("link");
+                int tier = rs.getInt("tier");
+                int solvedNum = rs.getInt("sovled_num");
+
+                TodayPSlist.add(new MainResponseDTO.TodayPSDTO(title, link, tier, solvedNum));
+            }
+
+            // 자원 해제
+            rs.close();
+            conn.close();
+
+            return TodayPSlist;  // 브론즈 5개, 실버 5개, 골드 5개 순서로 반환
+
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return null;
+    }
 
     /**
      * 메인 페이지의 정보를 가져오는 메서드입니다.
@@ -128,12 +128,12 @@ public class MainPage {
     public static MainResponseDTO.MainPageDTO getMainPage() {
         // 그룹 정보 및 오늘의 문제 리스트 조회
         MainResponseDTO.GroupInfoDTO groupInfoDTO = getGroupInfo();
-//        ArrayList<MainResponseDTO.TodayPSDTO> todayPSDTOList = getTodayPS();
+        ArrayList<MainResponseDTO.TodayPSDTO> todayPSDTOList = getTodayPS();
 
         // MainPageDTO 객체 생성 및 설정
         MainResponseDTO.MainPageDTO mainPageDTO = new MainResponseDTO.MainPageDTO();
         mainPageDTO.setGroupInfo(groupInfoDTO);
-//        mainPageDTO.setTodayPSList(todayPSDTOList);
+        mainPageDTO.setTodayPSList(todayPSDTOList);
 
         return mainPageDTO;
     }
