@@ -1,8 +1,6 @@
 package ggyuel.ggyuup.DataCrawling;
 
 import ggyuel.ggyuup.global.DBConnection;
-
-import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.json.JSONArray;
@@ -11,9 +9,6 @@ import org.json.JSONObject;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.net.URL;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -34,7 +29,7 @@ public class DataCrawlingService {
     private static ArrayList<String> users = new ArrayList<>();
     private static boolean[] solved = new boolean[40000];
 
-    @Scheduled(cron = "15 30 11 * * ?")
+    @Scheduled(cron = "15 35 10 * * ?")
     public void RefreshAllData() throws InterruptedException, IOException
     {
         log.info("크롤링 시작...");

@@ -2,7 +2,7 @@ package ggyuel.ggyuup.Problems.controller;
 
 import ggyuel.ggyuup.Problems.service.ProblemAlgo;
 import ggyuel.ggyuup.Problems.service.ProblemTier;
-import ggyuel.ggyuup.Problems.dto.ProblemRequestDTO;
+import ggyuel.ggyuup.Problems.dto.ProblemResponseDTO;
 import ggyuel.ggyuup.global.apiResponse.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +24,9 @@ public class ProblemController {
      * @return 성공 상태와 함께 필터링된 문제 목록을 포함하는 ApiResponse 객체입니다.
      */
     @GetMapping("/algo")
-    public ApiResponse<ArrayList<ProblemRequestDTO.ProblemAlgoDTO>> getProblemAlgo(@RequestParam("tag") String tag) {
+    public ApiResponse<ArrayList<ProblemResponseDTO.ProblemAlgoDTO>> getProblemAlgo(@RequestParam("tag") String tag) {
         // ProblemAlgo 서비스를 사용하여 지정된 태그로 문제를 가져옵니다
-        ArrayList<ProblemRequestDTO.ProblemAlgoDTO> problemAlgoList = ProblemAlgo.getProblemsByTag(tag);
+        ArrayList<ProblemResponseDTO.ProblemAlgoDTO> problemAlgoList = ProblemAlgo.getProblemsByTag(tag);
         // 성공 상태와 함께 ApiResponse로 문제 목록을 반환합니다
         return ApiResponse.onSuccess(problemAlgoList);
     }
@@ -38,9 +38,9 @@ public class ProblemController {
      * @return 성공 상태와 함께 필터링된 문제 목록을 포함하는 ApiResponse 객체입니다.
      */
     @GetMapping("/tier")
-    public ApiResponse<ArrayList<ProblemRequestDTO.ProblemTierDTO>> getProblemTier(@RequestParam("tier") int tier) {
+    public ApiResponse<ArrayList<ProblemResponseDTO.ProblemTierDTO>> getProblemTier(@RequestParam("tier") int tier) {
         // ProblemTier 서비스를 사용하여 지정된 티어로 문제를 가져옵니다
-        ArrayList<ProblemRequestDTO.ProblemTierDTO> problemTierList = ProblemTier.getProblemsByTier(tier);
+        ArrayList<ProblemResponseDTO.ProblemTierDTO> problemTierList = ProblemTier.getProblemsByTier(tier);
         // 성공 상태와 함께 ApiResponse로 문제 목록을 반환합니다
         return ApiResponse.onSuccess(problemTierList);
     }
