@@ -73,7 +73,7 @@ public class DataCrawlingService {
         )
         {
             DBconn.setAutoCommit(false);
-            stmt.executeUpdate("delete from TodayPs");
+            stmt.executeUpdate("delete from TodayPS");
             stmt.executeUpdate("delete from ProAlgo");
             stmt.executeUpdate("delete from Problems");
 
@@ -92,8 +92,8 @@ public class DataCrawlingService {
 
                     JSONObject jsonResponse = new JSONObject(response.body());
                     // 데이터 처리는 여기서...
-
                     MaxPage = jsonResponse.getInt("count") / 50 + 1;
+                    log.info("안 푼 문제 가져오기: " + page + "/" + MaxPage + " page");
                     JSONArray itemlist = jsonResponse.getJSONArray("items");
                     for(Object item : itemlist) {
                         if(((JSONObject)item).getBoolean("official") == false) continue;
@@ -135,7 +135,7 @@ public class DataCrawlingService {
                     log.error("SQL error "+page+" page: "+e.getMessage());
                 }
             }
-            insertTodayPs(DBconn);
+            insertTodayPS(DBconn);
             DBconn.commit();
             DBconn.setAutoCommit(true);
         } catch (Exception e) {
@@ -143,9 +143,9 @@ public class DataCrawlingService {
         }
     }
 
-    public void insertTodayPs(Connection conn) {
-        //deleteTodayPs();
-        try(PreparedStatement pstmt = conn.prepareStatement("INSERT INTO TodayPs (problem_id) " +
+    public void insertTodayPS(Connection conn) {
+        log.info("TodayPS 삽입");
+        try(PreparedStatement pstmt = conn.prepareStatement("INSERT INTO TodayPS (problem_id) " +
                      "SELECT p.problem_id " +
                      "FROM Problems p " +
                      "JOIN (" +
