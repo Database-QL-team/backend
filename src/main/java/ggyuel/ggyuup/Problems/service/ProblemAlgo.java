@@ -29,28 +29,31 @@ public class ProblemAlgo {
             System.out.println(whichTag);
 
             // 쿼리 작성
-            String query = "SELECT title, link, tier, solved_num " +
-                    "FROM problems JOIN proalgo " +
-                    "WHERE algo_id = ? "+
-                    "ORDER BY solved_num DESC";
+            String query = "SELECT p.problem_id, p.title, p.link, p.tier, p.solved_num, pa.algo_id " +
+                    "FROM problems p JOIN proalgo pa ON p.problem_id = pa.problem_id " +
+                    "WHERE pa.algo_id = ? "+
+                    "ORDER BY p.solved_num DESC";
 
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setString(1, whichTag);
             System.out.println(query);
             ResultSet rs = pstmt.executeQuery();
 
+            System.out.println(rs);
 
             ArrayList<ProblemResponseDTO.ProblemAlgoDTO> result = new ArrayList<>();
 
             // 결과 처리
             while (rs.next()) {
-                // 튜플에서 title, link, tier, solvedNum 추출
+                // 튜플에서 problemId, title, link, tier, solvedNum 추출
+                int problemId = rs.getInt("problem_id");
                 String title = rs.getString("title");
                 String link = rs.getString("link");
                 int tier = rs.getInt("tier");
                 int solvedNum = rs.getInt("solved_num");
+                String algoId = rs.getString("algo_id");
 
-                ProblemResponseDTO.ProblemAlgoDTO problemAlgoDTO = new ProblemResponseDTO.ProblemAlgoDTO(title, link, tier, solvedNum);
+                ProblemResponseDTO.ProblemAlgoDTO problemAlgoDTO = new ProblemResponseDTO.ProblemAlgoDTO(problemId, title, link, tier, solvedNum, algoId);
                 System.out.println(problemAlgoDTO);
 
                 // 추출한 데이터로 ProblemAlgoDTO 객체 생성 및 각 DTO 객체 ArrayList에 추가

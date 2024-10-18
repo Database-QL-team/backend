@@ -94,18 +94,21 @@ public class MainPage {
 
             // 오늘의 문제 조회
             ResultSet rs = stmt.executeQuery(
-                    "SELECT title, link, tier, solved_num "
-                    + "FROM problems NATURAL JOIN todayps"
-                    + "ORDER BY tier");
+                    "SELECT p.problem_id, p.title, p.link, p.tier, p.solved_num " +
+                            "FROM todayps tp " +
+                            "JOIN problems p ON tp.problem_id = p.problem_id");
+
+            System.out.println(rs);
 
             // 결과를 TodayPSDTO 객체로 변환하여 리스트에 추가
             while (rs.next()) {
+                int problemId = rs.getInt("problem_id");
                 String title = rs.getString("title");
                 String link = rs.getString("link");
                 int tier = rs.getInt("tier");
-                int solvedNum = rs.getInt("sovled_num");
+                int solvedNum = rs.getInt("solved_num");
 
-                TodayPSlist.add(new MainResponseDTO.TodayPSDTO(title, link, tier, solvedNum));
+                TodayPSlist.add(new MainResponseDTO.TodayPSDTO(problemId, title, link, tier, solvedNum));
             }
 
             // 자원 해제
