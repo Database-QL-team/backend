@@ -29,7 +29,7 @@ public class DataCrawlingService {
     private static ArrayList<String> users = new ArrayList<>();
     private static boolean[] solved = new boolean[40000];
 
-    @Scheduled(cron = "15 35 10 * * ?")
+    @Scheduled(cron = "00 10 14 * * ?")
     public void RefreshAllData() throws InterruptedException, IOException
     {
         log.info("크롤링 시작...");
@@ -67,15 +67,15 @@ public class DataCrawlingService {
     void crawlProblems() {
         try(
                 Connection DBconn = DBConnection.getDbPool().getConnection();
-                PreparedStatement pstmtPro = DBconn.prepareStatement("INSERT INTO Problems(problem_id, title, tier, solved_num, link) VALUES (?,?,?,?,?)");
-                PreparedStatement pstmtAlgo = DBconn.prepareStatement("INSERT INTO ProAlgo(pro_algo_id, problem_id, algo_id) VALUES (?,?,?)");
+                PreparedStatement pstmtPro = DBconn.prepareStatement("INSERT INTO problems(problem_id, title, tier, solved_num, link) VALUES (?,?,?,?,?)");
+                PreparedStatement pstmtAlgo = DBconn.prepareStatement("INSERT INTO proalgo(pro_algo_id, problem_id, algo_id) VALUES (?,?,?)");
                 Statement stmt = DBconn.createStatement();
         )
         {
             DBconn.setAutoCommit(false);
-            stmt.executeUpdate("delete from TodayPS");
-            stmt.executeUpdate("delete from ProAlgo");
-            stmt.executeUpdate("delete from Problems");
+            stmt.executeUpdate("delete from todayps");
+            stmt.executeUpdate("delete from proalgo");
+            stmt.executeUpdate("delete from problems");
 
             int MaxPage = 1;
             int pro_algo_id = 1;
@@ -145,12 +145,12 @@ public class DataCrawlingService {
 
     public void insertTodayPS(Connection conn) {
         log.info("TodayPS 삽입");
-        try(PreparedStatement pstmt = conn.prepareStatement("INSERT INTO TodayPS (problem_id) " +
+        try(PreparedStatement pstmt = conn.prepareStatement("INSERT INTO todayps (problem_id) " +
                      "SELECT p.problem_id " +
-                     "FROM Problems p " +
+                     "FROM problems p " +
                      "JOIN (" +
                      "    SELECT tier, MAX(solved_num) AS max_solved_num " +
-                     "    FROM Problems " +
+                     "    FROM problems " +
                      "    WHERE tier >= 1 AND tier <= 19 " +
                      "    GROUP BY tier " +
                      ") max_solved " +
@@ -215,11 +215,11 @@ public class DataCrawlingService {
         try(
                 Connection DBconn = DBConnection.getDbPool().getConnection();
                 Statement stmt = DBconn.createStatement();
-                PreparedStatement pstmt = DBconn.prepareStatement("insert into Organizations (group_name, solved_num, ranking) values(?,?,?)");
+                PreparedStatement pstmt = DBconn.prepareStatement("insert into organizations (group_name, solved_num, ranking) values(?,?,?)");
         )
         {
             DBconn.setAutoCommit(false);
-            stmt.executeUpdate("delete from Organizations");
+            stmt.executeUpdate("delete from organizations");
 
             for(int i=1; i<=2; i++) {
                 Document doc = Jsoup.connect(URL+i).get();

@@ -28,9 +28,9 @@ public class ProblemTier {
             int whichTier = request;
 
             // 쿼리 작성
-            String query = "SELECT title, link, tier, solved_num " +
-                    "FROM problems " +
-                    "WHERE tier = ? " +
+            String query = "SELECT p.problem_id, p.title, p.link, p.tier, p.solved_num, pa.algo_id " +
+                    "FROM problems p JOIN proalgo pa ON p.problem_id = pa.problem_id " +
+                    "WHERE p.tier = ? " +
                     "ORDER BY solved_num DESC";
             PreparedStatement pstmt = conn.prepareStatement(query);
 
@@ -45,12 +45,14 @@ public class ProblemTier {
             // 결과 처리
             while (rs.next()) {
                 // 튜플에서 title, tier, link, solvednum 추출 후 ProblemTierDTO 객체 생성 후 ArrayList에 삽입
+                int problemId = rs.getInt("problem_id");
                 String title = rs.getString("title");
                 String link = rs.getString("link");
                 int tier = rs.getInt("tier");
-                int solvedPeople = rs.getInt("solved_num");
+                int solvedNum= rs.getInt("solved_num");
+                String algoId = rs.getString("algo_id");
 
-                tierProblems.add(new ProblemResponseDTO.ProblemTierDTO(title, link, tier, solvedPeople));
+                tierProblems.add(new ProblemResponseDTO.ProblemTierDTO(problemId, title, link, tier, solvedNum, algoId));
             }
 
             System.out.println(tierProblems);
